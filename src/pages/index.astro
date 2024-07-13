@@ -22,7 +22,7 @@ const people = await db.query.people.findMany({
     </header>
 
     <section class="flex flex-col gap-4">
-      <h2 class="text-lg flex-1">people</h2>
+      <h2 class="text-lg flex-1"><a href="/people" class="hover:underline">people</a></h2>
       <ul class="gap-4 flex flex-col">
         {people.map((person) => (
           <li>

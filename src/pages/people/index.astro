@@ -1,0 +1,33 @@
+---
+import { drizzle } from "drizzle-orm/d1"
+import Person from "../../components/Person.astro"
+import { schema } from "../../db"
+import Layout from "../../layouts/Layout.astro"
+
+const { env } = Astro.locals.runtime
+const db = drizzle(env.DB, { schema })
+
+const people = await db.query.people.findMany({
+	where: (p, { isNotNull }) => isNotNull(p.approvedAt),
+})
+---
+
+<Layout title="people of yvr.page">
+  <main class="max-w-2xl flex flex-col gap-10">
+    <h1 class="text-xl">people of yvr.page</h1>
+
+    <ul class="gap-4 flex flex-col">
+      {people.map((person) => (
+        <li>
+          <Person
+            username={person.username}
+            name={person.name ?? undefined}
+            does={person.does}
+            website={person.website}
+            bio={person.bio}
+          />
+        </li>
+      ))}
+    </ul>
+  </main>
+</Layout>

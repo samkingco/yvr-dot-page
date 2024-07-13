@@ -1,0 +1,43 @@
+---
+import { drizzle } from "drizzle-orm/d1"
+import Person from "../../components/Person.astro"
+import { schema } from "../../db"
+import Layout from "../../layouts/Layout.astro"
+
+const { username } = Astro.params
+if (!username) {
+	return Astro.redirect("/people", 302)
+}
+
+const { env } = Astro.locals.runtime
+const db = drizzle(env.DB, { schema })
+
+const person = await db.query.people.findFirst({
+	where: (p, { and, eq, isNotNull }) =>
+		and(eq(p.username, username), isNotNull(p.approvedAt)),
+})
+
+if (!person) {
+	Astro.response.status = 404
+	Astro.response.statusText = "person not found"
+	return
+}
+
+const name = person.name ?? `@${person.username}`
+---
+
+<Layout title={name}>
+  <main class="max-w-2xl flex flex-col gap-4">
+    <header>
+      <h1 class="text-xl">{name}</h1>
+      <p class="text-sm text-gray-600">
+        {person.does}
+      </p>
+      <p class="text-sm text-gray-600">
+        <a href={person.website} class="underline">{person.website}</a>
+      </p>
+    </header>
+
+    <p class="text-sm">{person.bio}</p>
+  </main>
+</Layout>
