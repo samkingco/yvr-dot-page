@@ -1,0 +1,24 @@
+{
+  "name": "yvr-dot-page",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro build && wrangler pages dev",
+    "astro": "astro",
+    "deploy": "astro build && wrangler pages deploy",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.8.1",
+    "@astrojs/cloudflare": "^11.0.1",
+    "astro": "^4.11.5",
+    "typescript": "^5.5.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240712.0",
+    "wrangler": "^3.64.0"
+  }
+}
