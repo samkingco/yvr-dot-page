@@ -1,55 +1,43 @@
 ---
+import { drizzle } from "drizzle-orm/d1"
 import * as v from "valibot"
+import { schema, validation } from "../../db"
 import Layout from "../../layouts/Layout.astro"
 
-if (Astro.request.method === "POST") {
-	const schema = v.object({
-		username: v.pipe(
-			v.string(),
-			v.trim(),
-			v.minLength(2, "must be at least 2 characters"),
-			v.maxLength(32, "must be 32 characters or less"),
-		),
-		name: v.optional(
-			v.pipe(
-				v.string(),
-				v.trim(),
-				v.maxLength(80, "must be 80 characters or less"),
-			),
-		),
-		does: v.pipe(
-			v.string(),
-			v.trim(),
-			v.maxLength(80, "must be 80 characters or less"),
-		),
-		website: v.pipe(
-			v.string(),
-			v.trim(),
-			v.maxLength(255, "must be 255 characters or less"),
-		),
-		bio: v.pipe(
-			v.string(),
-			v.trim(),
-			v.maxLength(180, "must be 180 characters or less"),
-		),
-	})
+const { env } = Astro.locals.runtime
+const db = drizzle(env.DB, { schema })
 
+if (Astro.request.method === "POST") {
 	try {
 		const data = await Astro.request.formData()
-
-		const username = data.get("username")
-		const name = data.get("name")
-		const does = data.get("does")
-		const website = data.get("website")
-		const bio = data.get("bio")
-
-		const parsed = v.safeParse(schema, { username, name, does, website, bio })
-		if (!parsed.success) {
-			console.log(parsed.issues)
-			return Astro.redirect("/submit")
+		const person = {
+			username: data.get("username"),
+			name: data.get("name"),
+			does: data.get("does"),
+			website: data.get("website"),
+			bio: data.get("bio"),
 		}
 
-		// Save to DB
+		const parsed = v.safeParse(validation.personSchema, person)
+
+		if (!parsed.success) {
+			console.log(parsed.issues)
+			return Astro.redirect("/submit", 400)
+		}
+
+		// Check the username is not already taken
+		const existing = await db.query.people.findFirst({
+			where: (p, { eq }) => eq(p.username, parsed.output.username),
+		})
+
+		if (existing) {
+			// TODO: Add a message to the form if the username is already taken
+			console.log("username already taken")
+			return Astro.redirect("/submit", 400)
+		}
+
+		await db.insert(schema.people).values(parsed.output)
+
 		console.log(parsed.output)
 		return Astro.redirect("/submit/success")
 	} catch (error) {

@@ -1,6 +1,15 @@
 ---
+import { drizzle } from "drizzle-orm/d1"
 import Person from "../components/Person.astro"
+import { schema } from "../db"
 import Layout from "../layouts/Layout.astro"
+
+const { env } = Astro.locals.runtime
+const db = drizzle(env.DB, { schema })
+
+const people = await db.query.people.findMany({
+	where: (p, { isNotNull }) => isNotNull(p.approvedAt),
+})
 ---
 
 <Layout title="Vancouver, BC">
@@ -15,15 +24,17 @@ import Layout from "../layouts/Layout.astro"
     <section class="flex flex-col gap-4">
       <h2 class="text-lg flex-1">people</h2>
       <ul class="gap-4 flex flex-col">
-        <li>
-          <Person
-            username="sam"
-            name="Sam King"
-            does="Software Engineering"
-            website="https://samking.co"
-            bio="Former photographer, turned designer, turned software engineer. Currently working at Future Primitive making photography related software. Also building Refrakt, a platform for sharing photography."
-          />
-        </li>
+        {people.map((person) => (
+          <li>
+            <Person
+              username={person.username}
+              name={person.name ?? undefined}
+              does={person.does}
+              website={person.website}
+              bio={person.bio}
+            />
+          </li>
+        ))}
       </ul>
     </section>
   </main>

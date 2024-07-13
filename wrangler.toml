@@ -3,14 +3,22 @@ name = "yvr-dot-page"
 compatibility_date = "2024-07-12"
 pages_build_output_dir = "./dist"
 
-[env.production]
-vars = { ENVIRONMENT = "production" }
+# Local
+vars = { ENVIRONMENT = "preview" }
 d1_databases = [
-  { binding = "DB", database_name = "yvr-dir", database_id = "6286496e-f251-430d-b7c5-2d5e13833263" },
+  { binding = "DB", database_name = "yvr-dir-preview", database_id = "55ba9497-b53e-41fd-b366-c197754eea54" },
 ]
 
+# Preview
 [env.preview]
 vars = { ENVIRONMENT = "preview" }
 d1_databases = [
   { binding = "DB", database_name = "yvr-dir-preview", database_id = "55ba9497-b53e-41fd-b366-c197754eea54" },
+]
+
+# Production
+[env.production]
+vars = { ENVIRONMENT = "production" }
+d1_databases = [
+  { binding = "DB", database_name = "yvr-dir", database_id = "6286496e-f251-430d-b7c5-2d5e13833263" },
 ]
