@@ -1,24 +1,29 @@
 {
-  "name": "yvr-dot-page",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro build && wrangler pages dev",
-    "astro": "astro",
-    "deploy": "astro build && wrangler pages deploy",
-    "cf-typegen": "wrangler types"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.8.1",
-    "@astrojs/cloudflare": "^11.0.1",
-    "astro": "^4.11.5",
-    "typescript": "^5.5.3"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240712.0",
-    "wrangler": "^3.64.0"
-  }
+	"name": "yvr-dot-page",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"build": "astro check && astro build",
+		"preview": "astro build && wrangler pages dev",
+		"astro": "astro",
+		"deploy": "astro build && wrangler pages deploy",
+		"cf-typegen": "wrangler types"
+	},
+	"dependencies": {
+		"@astrojs/check": "^0.8.1",
+		"@astrojs/cloudflare": "^11.0.1",
+		"@astrojs/tailwind": "^5.1.0",
+		"astro": "^4.11.5",
+		"cron-schedule": "^5.0.1",
+		"tailwindcss": "^3.4.4",
+		"typescript": "^5.5.3",
+		"valibot": "^0.36.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.8.3",
+		"@cloudflare/workers-types": "^4.20240712.0",
+		"wrangler": "^3.64.0"
+	}
 }

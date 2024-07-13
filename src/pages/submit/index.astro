@@ -1,0 +1,155 @@
+---
+import * as v from "valibot"
+import Layout from "../../layouts/Layout.astro"
+
+if (Astro.request.method === "POST") {
+	const schema = v.object({
+		username: v.pipe(
+			v.string(),
+			v.trim(),
+			v.minLength(2, "must be at least 2 characters"),
+			v.maxLength(32, "must be 32 characters or less"),
+		),
+		name: v.optional(
+			v.pipe(
+				v.string(),
+				v.trim(),
+				v.maxLength(80, "must be 80 characters or less"),
+			),
+		),
+		does: v.pipe(
+			v.string(),
+			v.trim(),
+			v.maxLength(80, "must be 80 characters or less"),
+		),
+		website: v.pipe(
+			v.string(),
+			v.trim(),
+			v.maxLength(255, "must be 255 characters or less"),
+		),
+		bio: v.pipe(
+			v.string(),
+			v.trim(),
+			v.maxLength(180, "must be 180 characters or less"),
+		),
+	})
+
+	try {
+		const data = await Astro.request.formData()
+
+		const username = data.get("username")
+		const name = data.get("name")
+		const does = data.get("does")
+		const website = data.get("website")
+		const bio = data.get("bio")
+
+		const parsed = v.safeParse(schema, { username, name, does, website, bio })
+		if (!parsed.success) {
+			console.log(parsed.issues)
+			return Astro.redirect("/submit")
+		}
+
+		// Save to DB
+		console.log(parsed.output)
+		return Astro.redirect("/submit/success")
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error.message)
+		}
+	}
+}
+---
+
+<Layout title="Submit">
+  <main class="flex flex-col gap-10">
+    <header>
+      <h1 class="text-xl">submit</h1>
+      <p class="text-sm text-gray-600">profiles are vetted by admins before being added to the directory</p>
+    </header>
+
+    <form method="POST" class="flex flex-col gap-6 max-w-2xl">
+      <label class="flex flex-col gap-1">
+        <p class="text-sm">
+          <span class="block">
+            username
+          </span>
+          <span class="block text-gray-500">
+            used in your profile URL e.g. yvr.page/people/mr-peanut
+          </span>
+        </p>
+        <input
+          type="text"
+          name="username"
+          required
+          minlength="2"
+          maxlength="32"
+          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"
+        />
+      </label>
+      
+      <label class="flex flex-col gap-1">
+        <p class="text-sm">
+          name <span class="text-gray-500">(optional)</span>
+          <span class="block text-gray-500">
+            your username will be used if you choose not to provide a name
+          </span>
+        </p>
+        <input
+          type="text"
+          name="name"
+          maxlength="80"
+          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <p class="text-sm">
+          what do you do?
+          <span class="block text-gray-500">
+            for example: painter, software engineer, photographer, etc.
+          </span>
+        </p>
+        <input
+          type="text"
+          name="does"
+          maxlength="80"
+          required
+          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <p class="text-sm">
+          website
+          <span class="block text-gray-500">
+            can also be a social media profile if you don't have one
+          </span>
+        </p>
+        <input
+          type="url"
+          name="website"
+          maxlength="255"
+          required
+          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <p class="text-sm">
+          short bio
+          <span class="block text-gray-500">
+            for example: what are you passionate about and what do you like to do?
+          </span>
+        </p>
+        <textarea
+          name="bio"
+          maxlength="240"
+          required
+          rows="4"
+          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"></textarea>
+      </label>
+
+      <button class="bg-black text-white px-4 py-3 w-fit">submit</button>
+    </form>
+  </main>
+</Layout>
