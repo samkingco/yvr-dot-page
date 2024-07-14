@@ -1,7 +1,7 @@
 ---
-import Heading from "../../components/Heading.astro"
-import Person from "../../components/Person.astro"
-import Layout from "../../layouts/Layout.astro"
+import Heading from "@components/Heading.astro"
+import Person from "@components/Person.astro"
+import Layout from "@layouts/Layout.astro"
 
 const { db } = Astro.locals
 
@@ -18,7 +18,7 @@ const people = await db.query.profiles.findMany({
 ---
 
 <Layout title="people of yvr.page">
-  <main class="max-w-lg flex flex-col gap-10">
+  <main class="max-w-xl flex flex-col gap-10">
     <Heading level="h1">people</Heading>
     <ul class="gap-4 flex flex-col">
       {people.map((person) => (

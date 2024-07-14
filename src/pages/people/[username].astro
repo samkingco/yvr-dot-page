@@ -1,7 +1,7 @@
 ---
-import Heading from "../../components/Heading.astro"
-import Paragraph from "../../components/Paragraph.astro"
-import Layout from "../../layouts/Layout.astro"
+import Heading from "@components/Heading.astro"
+import Paragraph from "@components/Paragraph.astro"
+import Layout from "@layouts/Layout.astro"
 
 const { username } = Astro.params
 if (!username) {
@@ -10,7 +10,7 @@ if (!username) {
 
 const { db } = Astro.locals
 
-const person = await db.query.people.findFirst({
+const person = await db.query.profiles.findFirst({
 	where: (p, { and, eq, isNotNull }) =>
 		and(eq(p.username, username), isNotNull(p.approvedAt)),
 })
@@ -26,7 +26,7 @@ const displayUrl = new URL(person.website).hostname
 ---
 
 <Layout title={name}>
-  <main class="max-w-lg flex flex-col gap-4">
+  <main class="max-w-xl flex flex-col gap-4">
     <header>
       <Heading level="h1">{name}</Heading>
       <Paragraph class="text-sm">

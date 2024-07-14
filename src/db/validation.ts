@@ -27,6 +27,11 @@ export const verifyCodeSchema = v.object({
 	),
 })
 
+export const reviewProfileSchema = v.object({
+	id: v.string(),
+	status: v.picklist(["approved", "rejected"]),
+})
+
 export const profileSchema = v.object({
 	username: v.pipe(
 		v.string(),

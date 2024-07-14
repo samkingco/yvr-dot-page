@@ -4,6 +4,7 @@ import Heading from "@components/Heading.astro"
 import Paragraph from "@components/Paragraph.astro"
 import { id, schema, validation } from "@db/index"
 import Layout from "@layouts/Layout.astro"
+import { eq } from "drizzle-orm"
 import * as v from "valibot"
 
 const { db, session } = Astro.locals
@@ -77,6 +78,7 @@ if (Astro.request.method === "POST") {
 		const existing = await db.query.profiles.findFirst({
 			where: (p, { eq }) => eq(p.username, parsed.output.username),
 			columns: {
+				id: true,
 				userId: true,
 				username: true,
 			},
@@ -87,11 +89,22 @@ if (Astro.request.method === "POST") {
 			return Astro.redirect(returnUrl.toString())
 		}
 
-		await db.insert(schema.profiles).values({
-			id: id("profile"),
-			userId: session.userId,
-			...parsed.output,
-		})
+		if (existing) {
+			await db
+				.update(schema.profiles)
+				.set({
+					...parsed.output,
+				})
+				.where(eq(schema.profiles.id, existing.id))
+		} else {
+			await db.insert(schema.profiles).values({
+				id: id("profile"),
+				userId: session.userId,
+				...parsed.output,
+			})
+		}
+
+		return Astro.redirect("/profile")
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error(error.message)
@@ -101,7 +114,7 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout title={profile?.name ?? "profile"}>
-  <main class="max-w-lg flex flex-col gap-10">
+  <main class="max-w-xl flex flex-col gap-10">
     <header class="flex flex-col gap-2">
       <Heading level="h1">profile</Heading>
       <Paragraph class="text-sm">
