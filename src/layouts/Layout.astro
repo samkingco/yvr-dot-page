@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from "astro:transitions"
 import Paragraph from "@components/Paragraph.astro"
 
 interface Props {
@@ -30,9 +31,10 @@ if (session) {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ViewTransitions />
   </head>
   <body class="pt-8 pb-16 px-4 md:px-8 lg:px-12 lg:pt-12">
-    <nav class="mb-12 flex gap-4">
+    <nav class="mb-12 flex gap-4" transition:persist>
       <ul class="flex-1 flex gap-6 text-sm font-bold">
         <li>
           <Paragraph>
