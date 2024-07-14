@@ -38,17 +38,6 @@ const people = await db.query.people.findMany({
             />
           </li>
         ))}
-        {people.map((person) => (
-          <li>
-            <Person
-              username={person.username}
-              name={person.name ?? undefined}
-              does={person.does}
-              website={person.website}
-              bio={person.bio}
-            />
-          </li>
-        ))}
       </ul>
     </section>
 
