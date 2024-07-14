@@ -33,6 +33,8 @@ const errors = [
 	["bio", Astro.url.searchParams.get("error.bio")],
 ].filter(([_, value]) => !!value)
 
+const success = !!Astro.url.searchParams.get("success")
+
 if (Astro.request.method === "POST") {
 	try {
 		const data = await Astro.request.formData()
@@ -104,7 +106,10 @@ if (Astro.request.method === "POST") {
 			})
 		}
 
-		return Astro.redirect("/profile")
+		const redirect = new URL("/profile", Astro.url.origin)
+		redirect.searchParams.set("success", "true")
+
+		return Astro.redirect(redirect.toString())
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error(error.message)
@@ -115,6 +120,12 @@ if (Astro.request.method === "POST") {
 
 <Layout title={profile?.name ?? "profile"}>
   <main class="max-w-xl flex flex-col gap-10">
+    {success && (
+      <div class="fixed bottom-4 right-4 p-2 md:right-8 lg:right-12 bg-foreground text-background font-bold text-sm" data-success-toast>
+        <Paragraph>+ profile saved!</Paragraph>
+      </div>
+    )}
+
     <header class="flex flex-col gap-2">
       <Heading level="h1">profile</Heading>
       <Paragraph class="text-sm">
@@ -249,5 +260,12 @@ if (Astro.request.method === "POST") {
     }
 
     usernameInput?.addEventListener('input', onInputChange)
+
+    const successToast = document.querySelector<HTMLDivElement>('[data-success-toast]')
+    if (successToast) {
+      setTimeout(() => {
+        successToast.remove()
+      }, 3000)
+    }
   });
 </script>
