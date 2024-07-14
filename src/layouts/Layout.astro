@@ -3,9 +3,14 @@ import Paragraph from "@components/Paragraph.astro"
 
 interface Props {
 	title: string
+	description?: string
 }
 
-const { title } = Astro.props
+const {
+	title,
+	description = "a community site for meeting new folks in Vancouver who are into art, technology, music, and other creative pursuits",
+} = Astro.props
+
 const { session, db } = Astro.locals
 const pathname = new URL(Astro.request.url).pathname
 
@@ -25,11 +30,23 @@ if (session) {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="https://yvr.page" />
+    <meta property="og:site_name" content={title} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@yvrdotpage" />
   </head>
   <body class="pt-8 pb-16 px-4 md:px-8 lg:px-12 lg:pt-12">
     <nav class="mb-12 flex gap-4">
