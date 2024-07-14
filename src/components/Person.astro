@@ -16,7 +16,7 @@ const { username, name, does, website, bio } = Astro.props
 <div>
   <div class="flex gap-2 items-baseline">
     <Heading level="h3">
-      <a href={website}>{name ?? `@${username}`}</a>
+      <a href={website} class="internal-link">{name ?? `@${username}`}</a>
     </Heading>
     <Paragraph class="text-sm">
       &ndash; {does}
