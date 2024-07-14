@@ -8,22 +8,61 @@ import Layout from "../../layouts/Layout.astro"
 const { env } = Astro.locals.runtime
 const db = drizzle(env.DB, { schema })
 
+const initialValues = {
+	username: Astro.url.searchParams.get("username") ?? "",
+	name: Astro.url.searchParams.get("name") ?? "",
+	does: Astro.url.searchParams.get("does") ?? "",
+	website: Astro.url.searchParams.get("website") ?? "",
+	bio: Astro.url.searchParams.get("bio") ?? "",
+}
+
+const errors = [
+	["username", Astro.url.searchParams.get("error.username")],
+	["name", Astro.url.searchParams.get("error.name")],
+	["does", Astro.url.searchParams.get("error.does")],
+	["website", Astro.url.searchParams.get("error.website")],
+	["bio", Astro.url.searchParams.get("error.bio")],
+].filter(([_, value]) => !!value)
+
 if (Astro.request.method === "POST") {
 	try {
 		const data = await Astro.request.formData()
+		const unsafeWebsite = data.get("website")?.toString()
+		const safeWebsite =
+			unsafeWebsite &&
+			new URL(
+				unsafeWebsite.startsWith("http")
+					? unsafeWebsite
+					: `https://${unsafeWebsite}`,
+			)
+
 		const person = {
-			username: data.get("username"),
-			name: data.get("name"),
-			does: data.get("does"),
-			website: data.get("website"),
-			bio: data.get("bio"),
+			username: data.get("username")?.toString() ?? "",
+			name: data.get("name")?.toString() ?? "",
+			does: data.get("does")?.toString() ?? "",
+			website: safeWebsite?.toString() ?? "",
+			bio: data.get("bio")?.toString() ?? "",
 		}
+
+		const returnUrl = new URL(Astro.url.pathname, Astro.url.origin)
+		returnUrl.searchParams.set("username", person.username)
+		returnUrl.searchParams.set("name", person.name)
+		returnUrl.searchParams.set("does", person.does)
+		returnUrl.searchParams.set("website", person.website)
+		returnUrl.searchParams.set("bio", person?.bio)
 
 		const parsed = v.safeParse(validation.personSchema, person)
 
 		if (!parsed.success) {
-			console.log(parsed.issues)
-			return Astro.redirect("/submit", 400)
+			for (const issue of parsed.issues) {
+				if (issue.path) {
+					returnUrl.searchParams.set(
+						`error.${issue.path.map((p) => p.key).join(".")}`,
+						issue.message,
+					)
+				}
+			}
+			return Astro.redirect(returnUrl.toString())
 		}
 
 		// Check the username is not already taken
@@ -32,9 +71,8 @@ if (Astro.request.method === "POST") {
 		})
 
 		if (existing) {
-			// TODO: Add a message to the form if the username is already taken
-			console.log("username already taken")
-			return Astro.redirect("/submit", 400)
+			returnUrl.searchParams.set("error.username", "username is already taken")
+			return Astro.redirect(returnUrl.toString())
 		}
 
 		await db.insert(schema.people).values(parsed.output)
@@ -48,24 +86,35 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout title="Submit">
-  <main class="flex flex-col cursor-pointer">
-    <form method="POST" class="flex flex-col gap-8 max-w-lg">
+  <main class="max-w-lg flex flex-col gap-8">
+    {errors.length > 0 && (
+      <div class="font-bold text-sm">
+        <Paragraph>there {errors.length === 1 ? "was an issue" : "were some issues"} with your submission…</Paragraph>
+        <ul>
+          {errors.map(([key, error]) => (
+            <li>
+              <Paragraph>&nbsp;+ {error}</Paragraph>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <form method="POST" class="flex flex-col gap-8">
       <label class="flex flex-col cursor-pointer">
         <Paragraph class="text-sm">
           <span class="font-bold">
-            username
+            {errors.some(([key]) => key === "username") && "+ "}username
           </span>
           <span class="sr-only">;</span>
           <span class="block">
-            used in your url e.g. /people/<span class="font-bold" data-username-placeholder>mr-peanut</span>
+            yvr.page/people/<span class="font-bold" data-username-placeholder></span>
           </span>
         </Paragraph>
         <input
           type="text"
           name="username"
-          required
-          minlength="2"
-          maxlength="32"
+          value={initialValues.username}
           class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
         />
       </label>
@@ -73,7 +122,7 @@ if (Astro.request.method === "POST") {
       <label class="flex flex-col cursor-pointer">
         <Paragraph class="text-sm">
           <span class="font-bold">
-            name
+            {errors.some(([key]) => key === "name") && "+ "}name
           </span>
           (optional)<span class="sr-only">;</span>
           <span class="block">
@@ -83,7 +132,7 @@ if (Astro.request.method === "POST") {
         <input
           type="text"
           name="name"
-          maxlength="80"
+          value={initialValues.name}
           class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out placeholder:text-foreground/30"
         />
       </label>
@@ -91,7 +140,7 @@ if (Astro.request.method === "POST") {
       <label class="flex flex-col cursor-pointer">
         <Paragraph class="text-sm">
           <span class="font-bold">
-            what do you do?
+            {errors.some(([key]) => key === "does") && "+ "}what do you do?
           </span>
           <span class="sr-only">;</span>
           <span class="block">
@@ -101,8 +150,7 @@ if (Astro.request.method === "POST") {
         <input
           type="text"
           name="does"
-          maxlength="80"
-          required
+          value={initialValues.does}
           class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
         />
       </label>
@@ -110,18 +158,18 @@ if (Astro.request.method === "POST") {
       <label class="flex flex-col cursor-pointer">
         <Paragraph class="text-sm">
           <span class="font-bold">
-            website
+            {errors.some(([key]) => key === "website") && "+ "}website or social profile
           </span>
           <span class="sr-only">;</span>
           <span class="block">
-            can also be a social media profile if you don't have one
+            will be linked so people can contact you
           </span>
         </Paragraph>
         <input
-          type="url"
+          type="text"
+          inputmode="url"
           name="website"
-          maxlength="255"
-          required
+          value={initialValues.website}
           class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
         />
       </label>
@@ -129,7 +177,7 @@ if (Astro.request.method === "POST") {
       <label class="flex flex-col cursor-pointer">
         <Paragraph class="text-sm">
           <span class="font-bold">
-            short bio
+            {errors.some(([key]) => key === "bio") && "+ "}short bio
           </span>
           <span class="sr-only">;</span>
           <span class="block">
@@ -138,10 +186,9 @@ if (Astro.request.method === "POST") {
         </Paragraph>
         <textarea
           name="bio"
-          maxlength="240"
-          required
           rows="4"
-          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out resize-none"></textarea>
+          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out resize-none"
+        >{initialValues.bio}</textarea>
       </label>
 
       <button class="px-4 py-3 w-fit outline-none font-bold text-sm border-2 border-foreground/20 hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background motion-safe:transition-colors motion-safe:duration-100 motion-safe:ease-out">submit &rarr;</button>
@@ -158,7 +205,7 @@ if (Astro.request.method === "POST") {
     function onInputChange() {
       if (usernamePlaceholder && usernameInput) {
         const inputValue = usernameInput.value.trim()
-        usernamePlaceholder.textContent = inputValue || "mr-peanut"
+        usernamePlaceholder.textContent = inputValue || ""
       }
 
       if (usernameInput && nameInput) {
