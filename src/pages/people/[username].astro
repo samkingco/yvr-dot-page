@@ -1,9 +1,6 @@
 ---
-import { drizzle } from "drizzle-orm/d1"
 import Heading from "../../components/Heading.astro"
 import Paragraph from "../../components/Paragraph.astro"
-import Person from "../../components/Person.astro"
-import { schema } from "../../db"
 import Layout from "../../layouts/Layout.astro"
 
 const { username } = Astro.params
@@ -11,8 +8,7 @@ if (!username) {
 	return Astro.redirect("/people", 302)
 }
 
-const { env } = Astro.locals.runtime
-const db = drizzle(env.DB, { schema })
+const { db } = Astro.locals
 
 const person = await db.query.people.findFirst({
 	where: (p, { and, eq, isNotNull }) =>

@@ -15,6 +15,34 @@
       "when": 1720909068005,
       "tag": "0001_wonderful_living_lightning",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1720976623014,
+      "tag": "0002_plain_kingpin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1720979227191,
+      "tag": "0003_flowery_wonder_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1720986223187,
+      "tag": "0004_lyrical_gamora",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1720989335011,
+      "tag": "0005_misty_tigra",
+      "breakpoints": true
     }
   ]
 }

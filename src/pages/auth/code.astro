@@ -1,0 +1,156 @@
+---
+import Button from "@components/Button.astro"
+import Paragraph from "@components/Paragraph.astro"
+import { id, schema, validation } from "@db/index"
+import Layout from "@layouts/Layout.astro"
+import { eq } from "drizzle-orm"
+import { isWithinExpirationDate } from "oslo"
+import * as v from "valibot"
+
+const initialValues = {
+	email: Astro.url.searchParams.get("email") ?? "",
+}
+
+if (!initialValues.email) {
+	return Astro.redirect("/auth/login")
+}
+
+const errors = [
+	["email", Astro.url.searchParams.get("error.email")],
+	["code", Astro.url.searchParams.get("error.code")],
+].filter(([_, value]) => !!value)
+
+if (Astro.request.method === "POST") {
+	const { db, auth } = Astro.locals
+
+	try {
+		const data = await Astro.request.formData()
+		const unsafeEmail = data.get("email")?.toString() ?? ""
+		const unsafeCode = data.get("code")?.toString() ?? ""
+
+		const returnUrl = new URL(Astro.url.pathname, Astro.url.origin)
+		returnUrl.searchParams.set("email", unsafeEmail)
+
+		const parsed = v.safeParse(validation.verifyCodeSchema, {
+			email: unsafeEmail,
+			code: unsafeCode.replace(/[^0-9]/g, ""),
+		})
+
+		if (!parsed.success) {
+			for (const issue of parsed.issues) {
+				if (issue.path) {
+					returnUrl.searchParams.set(
+						`error.${issue.path.map((p) => p.key).join(".")}`,
+						issue.message,
+					)
+				}
+			}
+			return Astro.redirect(returnUrl.toString())
+		}
+
+		const { email, code } = parsed.output
+
+		const verification = await db.query.emailVerifications.findFirst({
+			where: (e, { and, eq }) => and(eq(e.email, email), eq(e.code, code)),
+			columns: {
+				expiresAt: true,
+			},
+		})
+
+		const expires = new Date(verification?.expiresAt ?? Date.now())
+		const isValid = isWithinExpirationDate(expires)
+
+		if (!isValid) {
+			returnUrl.searchParams.set("error.code", "code has expired")
+			return Astro.redirect(returnUrl.toString())
+		}
+
+		await db
+			.delete(schema.emailVerifications)
+			.where(eq(schema.emailVerifications.email, email))
+
+		const userId = await (async () => {
+			const user = await db.query.users.findFirst({
+				where: (u, { eq }) => eq(u.email, email),
+			})
+
+			if (user && !user.emailVerifiedAt) {
+				await db
+					.update(schema.users)
+					.set({ emailVerifiedAt: Date.now() })
+					.where(eq(schema.users.email, email))
+			}
+
+			if (user) {
+				return user.id
+			}
+
+			const userId = id("user")
+			await db.insert(schema.users).values({
+				id: userId,
+				email,
+				emailVerifiedAt: Date.now(),
+				createdAt: Date.now(),
+				updatedAt: Date.now(),
+				role: "user",
+			})
+
+			return userId
+		})()
+
+		const session = await auth.createSession(userId, {})
+		const sessionCookie = auth.createSessionCookie(session.id)
+		Astro.cookies.set(
+			sessionCookie.name,
+			sessionCookie.value,
+			sessionCookie.attributes,
+		)
+
+		return Astro.redirect(Astro.url.searchParams.get("return") ?? "/")
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error.message)
+		}
+	}
+}
+---
+
+<Layout title="confirm code">
+  <main class="max-w-lg flex flex-col gap-8">
+		{errors.length > 0 && (
+      <div class="font-bold text-sm">
+        <Paragraph>there {errors.length === 1 ? "was an issue" : "were some issues"} with your code…</Paragraph>
+        <ul>
+          {errors.map(([key, error]) => (
+            <li>
+              <Paragraph>&nbsp;+ {error}</Paragraph>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <form method="POST" class="flex flex-col gap-8">
+      <input type="hidden" name="email" value={initialValues.email} />
+
+      <label class="flex flex-col cursor-pointer">
+        <Paragraph class="text-sm">
+          <span class="font-bold">
+            6 digit auth code
+          </span>
+          <span class="sr-only">;</span>
+          <span class="block">
+            you may have to check your spam folder while we're still new
+          </span>
+        </Paragraph>
+        <input
+          type="text"
+          name="code"
+          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
+        />
+      </label>
+      
+      <Button type="submit">confirm code</Button>
+    </form>
+  </main>
+</Layout>

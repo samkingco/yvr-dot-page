@@ -1,22 +1,26 @@
 ---
-import { drizzle } from "drizzle-orm/d1"
 import Heading from "../components/Heading.astro"
 import Paragraph from "../components/Paragraph.astro"
 import Person from "../components/Person.astro"
-import { schema } from "../db"
 import Layout from "../layouts/Layout.astro"
 
-const { env } = Astro.locals.runtime
-const db = drizzle(env.DB, { schema })
+const { db } = Astro.locals
 
-const people = await db.query.people.findMany({
+const people = await db.query.profiles.findMany({
 	where: (p, { isNotNull }) => isNotNull(p.approvedAt),
+	columns: {
+		username: true,
+		name: true,
+		does: true,
+		website: true,
+		bio: true,
+	},
 })
 ---
 
 <Layout title="Vancouver, BC">
   <main class="max-w-lg flex flex-col gap-10">
-    <header>
+    <header class="flex flex-col gap-2">
       <Heading level="h1">yvr.page</Heading>
       <Paragraph class="text-sm">
         a community site for meeting new folks in Vancouver, BC
@@ -33,7 +37,7 @@ const people = await db.query.people.findMany({
           <li>
             <Person
               username={person.username}
-              name={person.name ?? undefined}
+              name={person.name}
               does={person.does}
               website={person.website}
               bio={person.bio}

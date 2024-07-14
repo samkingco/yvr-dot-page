@@ -1,0 +1,22 @@
+---
+import { cn } from "../utils"
+
+type Props = {
+	class?: string
+	type?: "submit" | "reset" | "button"
+}
+
+const { class: _className, type = "button" } = Astro.props
+
+const className = cn(
+	"px-4 py-3 w-fit",
+	"font-bold text-sm",
+	"border-2 border-foreground/20 outline-none",
+	"hover:bg-foreground hover:text-background",
+	"focus-visible:bg-foreground focus-visible:text-background",
+	"motion-safe:transition-colors motion-safe:duration-100 motion-safe:ease-out",
+	_className,
+)
+---
+
+<button class={className} type={type}><slot /></button>

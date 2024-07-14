@@ -1,6 +1,33 @@
 import * as v from "valibot"
 
-export const personSchema = v.object({
+export const authEmailSchema = v.pipe(
+	v.string(),
+	v.trim(),
+	v.email("email must be a valid email address"),
+	v.minLength(1, "email is required"),
+	v.maxLength(255, "email must be 255 characters or less"),
+)
+
+export const signupSchema = v.object({
+	email: authEmailSchema,
+	mailingList: v.optional(v.boolean(), false),
+})
+
+export const loginSchema = v.object({
+	email: authEmailSchema,
+})
+
+export const verifyCodeSchema = v.object({
+	email: authEmailSchema,
+	code: v.pipe(
+		v.string(),
+		v.trim(),
+		v.minLength(1, "code is required"),
+		v.maxLength(6, "code must be 6 characters or less"),
+	),
+})
+
+export const profileSchema = v.object({
 	username: v.pipe(
 		v.string(),
 		v.trim(),
@@ -38,5 +65,5 @@ export const personSchema = v.object({
 	),
 })
 
-export type Person = v.InferOutput<typeof personSchema>
-export type PersonInput = v.InferInput<typeof personSchema>
+export type Profile = v.InferOutput<typeof profileSchema>
+export type ProfileInput = v.InferInput<typeof profileSchema>

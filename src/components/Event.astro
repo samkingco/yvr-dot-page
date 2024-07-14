@@ -1,0 +1,62 @@
+---
+import { parseCronExpression } from "cron-schedule"
+
+interface Props {
+	href: string
+	title: string
+	description: string
+	startDate: Date
+	endDate?: Date
+	cronExpression?: string
+	organizedBy?: Array<{ name: string; href: string }>
+}
+
+const {
+	href,
+	title,
+	description,
+	startDate,
+	endDate,
+	cronExpression,
+	organizedBy,
+} = Astro.props
+
+const nextOccurrence = cronExpression
+	? parseCronExpression(cronExpression).getNextDate()
+	: startDate
+
+const isUpcoming = nextOccurrence > new Date()
+const isRecurring = !!cronExpression
+const hasEnded = endDate && endDate < new Date()
+
+const dateDescription = isUpcoming
+	? `Next ${startDate.toLocaleTimeString()}`
+	: isRecurring
+		? `Recurring ${startDate.toLocaleTimeString()}`
+		: hasEnded
+			? `Ended ${startDate.toLocaleTimeString()}`
+			: startDate.toLocaleTimeString()
+---
+
+<div>
+  <h3 class="text-md">
+    <a href={href}>
+      {title}
+    </a>
+  </h3>
+  <p class="text-sm text-gray-500">{dateDescription}</p>
+  <p class="text-sm">{description}</p>
+  {
+    organizedBy && (
+      <p class="text-sm text-gray-500">
+        By{" "}
+        {organizedBy?.map((o, idx) => (
+          <>
+            <a href={o.href}>{o.name}</a>
+            {idx < organizedBy.length - 1 && <>, </>}
+          </>
+        ))}
+      </p>
+    )
+  }
+</div>

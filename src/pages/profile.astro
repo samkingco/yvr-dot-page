@@ -1,20 +1,28 @@
 ---
-import { drizzle } from "drizzle-orm/d1"
+import Button from "@components/Button.astro"
+import Heading from "@components/Heading.astro"
+import Paragraph from "@components/Paragraph.astro"
+import { id, schema, validation } from "@db/index"
+import Layout from "@layouts/Layout.astro"
 import * as v from "valibot"
-import Paragraph from "../../components/Paragraph.astro"
-import { schema, validation } from "../../db"
-import Layout from "../../layouts/Layout.astro"
 
-const { env } = Astro.locals.runtime
-const db = drizzle(env.DB, { schema })
+const { db, session } = Astro.locals
 
-const initialValues = {
-	username: Astro.url.searchParams.get("username") ?? "",
-	name: Astro.url.searchParams.get("name") ?? "",
-	does: Astro.url.searchParams.get("does") ?? "",
-	website: Astro.url.searchParams.get("website") ?? "",
-	bio: Astro.url.searchParams.get("bio") ?? "",
+if (!session) {
+	return Astro.redirect("/auth/login", 302)
 }
+
+const profile = await db.query.profiles.findFirst({
+	where: (p, { eq }) => eq(p.userId, session.userId),
+	columns: {
+		username: true,
+		name: true,
+		does: true,
+		website: true,
+		bio: true,
+		approvedAt: true,
+	},
+})
 
 const errors = [
 	["username", Astro.url.searchParams.get("error.username")],
@@ -36,7 +44,7 @@ if (Astro.request.method === "POST") {
 					: `https://${unsafeWebsite}`,
 			)
 
-		const person = {
+		const create = {
 			username: data.get("username")?.toString() ?? "",
 			name: data.get("name")?.toString() ?? "",
 			does: data.get("does")?.toString() ?? "",
@@ -45,13 +53,13 @@ if (Astro.request.method === "POST") {
 		}
 
 		const returnUrl = new URL(Astro.url.pathname, Astro.url.origin)
-		returnUrl.searchParams.set("username", person.username)
-		returnUrl.searchParams.set("name", person.name)
-		returnUrl.searchParams.set("does", person.does)
-		returnUrl.searchParams.set("website", person.website)
-		returnUrl.searchParams.set("bio", person?.bio)
+		returnUrl.searchParams.set("username", create.username)
+		returnUrl.searchParams.set("name", create.name)
+		returnUrl.searchParams.set("does", create.does)
+		returnUrl.searchParams.set("website", create.website)
+		returnUrl.searchParams.set("bio", create?.bio)
 
-		const parsed = v.safeParse(validation.personSchema, person)
+		const parsed = v.safeParse(validation.profileSchema, create)
 
 		if (!parsed.success) {
 			for (const issue of parsed.issues) {
@@ -66,17 +74,24 @@ if (Astro.request.method === "POST") {
 		}
 
 		// Check the username is not already taken
-		const existing = await db.query.people.findFirst({
+		const existing = await db.query.profiles.findFirst({
 			where: (p, { eq }) => eq(p.username, parsed.output.username),
+			columns: {
+				userId: true,
+				username: true,
+			},
 		})
 
-		if (existing) {
+		if (existing && existing.userId !== session.userId) {
 			returnUrl.searchParams.set("error.username", "username is already taken")
 			return Astro.redirect(returnUrl.toString())
 		}
 
-		await db.insert(schema.people).values(parsed.output)
-		return Astro.redirect("/submit/success")
+		await db.insert(schema.profiles).values({
+			id: id("profile"),
+			userId: session.userId,
+			...parsed.output,
+		})
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error(error.message)
@@ -85,11 +100,18 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<Layout title="Submit">
-  <main class="max-w-lg flex flex-col gap-8">
+<Layout title={profile?.name ?? "profile"}>
+  <main class="max-w-lg flex flex-col gap-10">
+    <header class="flex flex-col gap-2">
+      <Heading level="h1">profile</Heading>
+      <Paragraph class="text-sm">
+        your information that's shown in the directory{(!profile || !profile.approvedAt) && " once approved"}
+      </Paragraph>
+    </header>
+
     {errors.length > 0 && (
       <div class="font-bold text-sm">
-        <Paragraph>there {errors.length === 1 ? "was an issue" : "were some issues"} with your submission…</Paragraph>
+        <Paragraph>there {errors.length === 1 ? "was an issue" : "were some issues"} with your profile…</Paragraph>
         <ul>
           {errors.map(([key, error]) => (
             <li>
@@ -114,8 +136,8 @@ if (Astro.request.method === "POST") {
         <input
           type="text"
           name="username"
-          value={initialValues.username}
-          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
+          value={profile?.username ?? ""}
+          class="text-sm leading-snug py-3 appearance-none outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
         />
       </label>
       
@@ -132,8 +154,8 @@ if (Astro.request.method === "POST") {
         <input
           type="text"
           name="name"
-          value={initialValues.name}
-          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out placeholder:text-foreground/30"
+          value={profile?.name ?? ""}
+          class="text-sm leading-snug py-3 appearance-none outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out placeholder:text-foreground/30"
         />
       </label>
 
@@ -150,8 +172,8 @@ if (Astro.request.method === "POST") {
         <input
           type="text"
           name="does"
-          value={initialValues.does}
-          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
+          value={profile?.does ?? ""}
+          class="text-sm leading-snug py-3 appearance-none outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
         />
       </label>
 
@@ -169,8 +191,8 @@ if (Astro.request.method === "POST") {
           type="text"
           inputmode="url"
           name="website"
-          value={initialValues.website}
-          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
+          value={profile?.website ?? ""}
+          class="text-sm leading-snug py-3 appearance-none outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
         />
       </label>
 
@@ -187,11 +209,11 @@ if (Astro.request.method === "POST") {
         <textarea
           name="bio"
           rows="4"
-          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out resize-none"
-        >{initialValues.bio}</textarea>
+          class="text-sm leading-normal py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out resize-none"
+        >{profile?.bio ?? ""}</textarea>
       </label>
 
-      <button class="px-4 py-3 w-fit outline-none font-bold text-sm border-2 border-foreground/20 hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background motion-safe:transition-colors motion-safe:duration-100 motion-safe:ease-out">submit &rarr;</button>
+      <Button type="submit">save</Button>
     </form>
   </main>
 </Layout>

@@ -1,0 +1,19 @@
+---
+const { session, auth } = Astro.locals
+
+const returnTo = Astro.url.searchParams.get("return")
+if (!session) {
+	return Astro.redirect(returnTo ?? "/")
+}
+
+if (Astro.request.method === "POST") {
+	await auth.invalidateSession(session.id)
+	const sessionCookie = auth.createBlankSessionCookie()
+	Astro.cookies.set(
+		sessionCookie.name,
+		sessionCookie.value,
+		sessionCookie.attributes,
+	)
+	return Astro.redirect(returnTo ?? "/")
+}
+---

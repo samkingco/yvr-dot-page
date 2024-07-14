@@ -1,0 +1,143 @@
+---
+import Button from "@components/Button.astro"
+import Paragraph from "@components/Paragraph.astro"
+import { emailAuthCode, id, schema, validation } from "@db/index"
+import Layout from "@layouts/Layout.astro"
+import * as v from "valibot"
+
+const returnTo = Astro.url.searchParams.get("return")
+if (Astro.locals.session) {
+	return Astro.redirect(returnTo ?? "/profile")
+}
+
+const initialValues = {
+	email: Astro.url.searchParams.get("email") ?? "",
+}
+
+const errors = [["email", Astro.url.searchParams.get("error.email")]].filter(
+	([_, value]) => !!value,
+)
+
+if (Astro.request.method === "POST") {
+	const { db, resend } = Astro.locals
+
+	try {
+		const data = await Astro.request.formData()
+		const unsafeEmail = data.get("email")?.toString() ?? ""
+		const unsafeMailingList = data.get("mailingList")?.toString() === "on"
+
+		const returnUrl = new URL(Astro.url.pathname, Astro.url.origin)
+		returnUrl.searchParams.set("email", unsafeEmail)
+		if (returnTo) {
+			returnUrl.searchParams.set("return", returnTo)
+		}
+
+		const parsed = v.safeParse(validation.signupSchema, {
+			email: unsafeEmail,
+			mailingList: unsafeMailingList,
+		})
+
+		if (!parsed.success) {
+			for (const issue of parsed.issues) {
+				if (issue.path) {
+					returnUrl.searchParams.set(
+						`error.${issue.path.map((p) => p.key).join(".")}`,
+						issue.message,
+					)
+				}
+			}
+			return Astro.redirect(returnUrl.toString())
+		}
+
+		// TODO: Save the mailing list flag in the db somewhere
+		const { email, mailingList } = parsed.output
+		const code = emailAuthCode()
+		const expiresAt = Date.now() + 1000 * 60 * 5
+
+		if (Astro.locals.runtime.env.ENVIRONMENT !== "production") {
+			console.log(`auth code for ${email}: ${code}`)
+		}
+
+		await db.insert(schema.emailVerifications).values({
+			id: id("emailVerification"),
+			email,
+			code,
+			expiresAt,
+		})
+
+		await resend.emails.send({
+			from: "yvr.page <info@notifications.yvr.page>",
+			reply_to: "noreply@notifications.yvr.page",
+			to: email,
+			subject: "Your auth code for yvr.page",
+			text: `Your auth code for yvr.page is: ${code}\n\nThis code will expire in 5 minutes\n\nIf you did not request this code, please ignore this email.`,
+		})
+
+		returnUrl.pathname = "/auth/code"
+		returnUrl.searchParams.set("email", email)
+
+		return Astro.redirect(returnUrl.toString())
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error.message)
+		}
+	}
+}
+---
+
+<Layout title="sign up">
+  <main class="max-w-lg flex flex-col gap-8">
+		{errors.length > 0 && (
+      <div class="font-bold text-sm">
+        <Paragraph>there {errors.length === 1 ? "was an issue" : "were some issues"} signing up…</Paragraph>
+        <ul>
+          {errors.map(([key, error]) => (
+            <li>
+              <Paragraph>&nbsp;+ {error}</Paragraph>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <form method="POST" class="flex flex-col gap-8">
+      <label class="flex flex-col cursor-pointer">
+        <Paragraph class="text-sm">
+          <span class="font-bold">
+            enter your email
+          </span>
+          <span class="sr-only">;</span>
+          <span class="block">
+            we'll send you a code to sign up, no password required
+          </span>
+        </Paragraph>
+        <input
+          type="text"
+					inputmode="email"
+          name="email"
+					value={initialValues.email}
+          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
+        />
+      </label>
+
+      <label class="flex flex-row gap-4 items-start cursor-pointer">
+        <input
+          type="checkbox"
+          name="mailingList"
+          class="mt-0.5 appearance-none w-4 h-4 outline-none bg-background border-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground checked:bg-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
+        />
+        <Paragraph class="text-sm">
+          <span class="font-bold">
+            join the mailing list
+          </span>
+          <span class="sr-only">;</span>
+          <span class="block">
+            occassional updates about new people and events
+          </span>
+        </Paragraph>
+      </label>
+      
+      <Button type="submit">sign up</Button>
+    </form>
+  </main>
+</Layout>

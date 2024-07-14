@@ -1,13 +1,24 @@
 ---
-import Paragraph from "../components/Paragraph.astro"
+import Paragraph from "@components/Paragraph.astro"
 
 interface Props {
 	title: string
 }
 
 const { title } = Astro.props
-
+const { session, db } = Astro.locals
 const pathname = new URL(Astro.request.url).pathname
+
+let isAdmin = false
+if (session) {
+	const user = await db.query.users.findFirst({
+		where: (p, { eq }) => eq(p.id, session.userId),
+		columns: {
+			role: true,
+		},
+	})
+	isAdmin = user?.role === "admin"
+}
 ---
 
 <!doctype html>
@@ -21,10 +32,10 @@ const pathname = new URL(Astro.request.url).pathname
     <title>{title}</title>
   </head>
   <body class="pt-8 pb-16 px-4 md:px-8 lg:px-12 lg:pt-12">
-    <nav class="mb-12">
-      <ul class="flex gap-6 text-sm">
+    <nav class="mb-12 flex gap-4">
+      <ul class="flex-1 flex gap-6 text-sm font-bold">
         <li>
-          <Paragraph class="text-sm font-bold">
+          <Paragraph>
             {pathname === "/"
               ? <span class="active-link">directory</span>
               : <a href="/" class="internal-link">directory</a>
@@ -32,22 +43,56 @@ const pathname = new URL(Astro.request.url).pathname
           </Paragraph>
         </li>
         <li>
-          <Paragraph class="text-sm font-bold">
+          <Paragraph>
             {pathname === "/about"
               ? <span class="active-link">about</span>
               : <a href="/about" class="internal-link">about</a>
             }
           </Paragraph>
         </li>
-        <li>
-          <Paragraph class="text-sm font-bold">
-            {pathname === "/submit"
-              ? <span class="active-link">submit</span>
-              : <a href="/submit" class="internal-link">submit</a>
-            }
-          </Paragraph>
-        </li>
       </ul>
+      {session ? (
+        <ul class="flex gap-6 text-sm">
+          <li>
+            <Paragraph class="font-bold">
+              {pathname === "/profile"
+                ? <span class="active-link">profile</span>
+                : <a href="/profile" class="internal-link">profile</a>
+              }
+            </Paragraph>
+          </li>
+          <li>
+            <form method="POST" action="/auth/logout">
+              <button type="submit" class="internal-link text-sm leading-snug font-bold appearance-none">  
+                log out
+              </button>
+            </form>
+          </li>
+          {isAdmin && (
+            <li>
+              <Paragraph class="font-bold">
+                {pathname === "/admin"
+                  ? <span class="active-link">admin</span>
+                  : <a href="/admin" class="internal-link">admin</a>
+                }
+              </Paragraph>
+            </li>
+          )}
+        </ul>
+      ) : (
+        <ul class="flex gap-6 text-sm">
+          <li>
+            <Paragraph class="font-bold">
+              <a href="/auth/login" class="internal-link">login</a>
+            </Paragraph>
+          </li>
+          <li>
+            <Paragraph class="font-bold">
+              <a href="/auth/signup" class="internal-link">sign up</a>
+            </Paragraph>
+          </li>
+        </ul>
+      )}
     </nav>
   </body>
 </html>
@@ -93,11 +138,13 @@ const pathname = new URL(Astro.request.url).pathname
   }
 
   .active-link {
+    @apply inline-block;
     @apply text-background bg-foreground;
     @apply px-0.5 -mx-0.5;
   }
 
   .internal-link {
+    @apply inline-block;
     @apply hover:text-background hover:bg-foreground;
     @apply focus-visible:text-background focus-visible:bg-foreground outline-none;
     @apply px-0.5 -mx-0.5;
