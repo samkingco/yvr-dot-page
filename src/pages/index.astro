@@ -31,7 +31,7 @@ const people = await db.query.profiles.findMany({
       <Heading level="h2">
         <a href="/people" class="internal-link">people</a>
       </Heading>
-      <span class="font-bold text-sm leading-none">--</span>
+      <span class="text-sm leading-none">--</span>
       <ul class="gap-4 flex flex-col">
         {people.map((person) => (
           <li>
@@ -51,7 +51,7 @@ const people = await db.query.profiles.findMany({
       <Heading level="h2">
         <a href="/events" class="internal-link">events</a>
       </Heading>
-      <span class="font-bold text-sm leading-none">--</span>
+      <span class="text-sm leading-none">--</span>
       <Paragraph class="text-sm">
         events are coming soon. dm <a href="/people/sk" class="font-bold internal-link">sam</a> if you're interested in hosting or sponsoring an event.
       </Paragraph>
