@@ -2,10 +2,27 @@
 export default {
 	content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
 	theme: {
-		extend: {
-			fontFamily: {
-				sans: ["CommitMono", "monospace"],
-			},
+		fontFamily: {
+			sans: ["CommitMono", "monospace"],
+		},
+		fontSize: {
+			DEFAULT: "1rem",
+			"heading-one": "3rem",
+			"heading-two": "2rem",
+			"heading-three": "1.6rem",
+			xl: "1.375rem",
+			lg: "1.125rem",
+			md: "1rem",
+			sm: "0.875rem",
+			xs: "0.75rem",
+			label: "0.875rem",
+			root: "16px",
+		},
+		colors: {
+			transparent: "transparent",
+			current: "currentColor",
+			background: "hsl(var(--background), <alpha-value>)",
+			foreground: "hsl(var(--foreground), <alpha-value>)",
 		},
 	},
 	plugins: [require("./tailwind.variableFontPlugin.js")],

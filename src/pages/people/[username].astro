@@ -24,20 +24,21 @@ if (!person) {
 }
 
 const name = person.name ?? `@${person.username}`
+const displayUrl = new URL(person.website).hostname
 ---
 
 <Layout title={name}>
-  <main class="max-w-2xl flex flex-col gap-4">
+  <main class="max-w-lg flex flex-col gap-4">
     <header>
-      <h1 class="text-xl">{name}</h1>
-      <p class="text-sm text-gray-600">
+      <h1 class="text-heading-three font-normal">{name}</h1>
+      <p class="text-sm leading-tight">
         {person.does}
       </p>
-      <p class="text-sm text-gray-600">
-        <a href={person.website} class="underline">{person.website}</a>
+      <p class="text-sm leading-tight">
+        <a href={person.website} class="internal-link underline decoration-foreground/20">{displayUrl}</a>
       </p>
     </header>
 
-    <p class="text-sm">{person.bio}</p>
+    <p class="text-sm leading-tight">{person.bio}</p>
   </main>
 </Layout>

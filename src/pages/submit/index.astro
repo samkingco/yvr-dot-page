@@ -37,8 +37,6 @@ if (Astro.request.method === "POST") {
 		}
 
 		await db.insert(schema.people).values(parsed.output)
-
-		console.log(parsed.output)
 		return Astro.redirect("/submit/success")
 	} catch (error) {
 		if (error instanceof Error) {
@@ -49,19 +47,15 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout title="Submit">
-  <main class="flex flex-col gap-10">
-    <header>
-      <h1 class="text-xl">submit</h1>
-      <p class="text-sm text-gray-600">profiles are vetted by admins before being added to the directory</p>
-    </header>
-
-    <form method="POST" class="flex flex-col gap-6 max-w-2xl">
-      <label class="flex flex-col gap-1">
-        <p class="text-sm">
-          <span class="block">
+  <main class="flex flex-col cursor-pointer">
+    <form method="POST" class="flex flex-col gap-8 max-w-lg">
+      <label class="flex flex-col cursor-pointer">
+        <p class="text-sm leading-tight">
+          <span class="font-bold">
             username
           </span>
-          <span class="block text-gray-500">
+          <span class="sr-only">;</span>
+          <span class="block">
             used in your profile URL e.g. yvr.page/people/mr-peanut
           </span>
         </p>
@@ -71,29 +65,35 @@ if (Astro.request.method === "POST") {
           required
           minlength="2"
           maxlength="32"
-          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"
+          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground"
         />
       </label>
       
-      <label class="flex flex-col gap-1">
-        <p class="text-sm">
-          name <span class="text-gray-500">(optional)</span>
-          <span class="block text-gray-500">
-            your username will be used if you choose not to provide a name
+      <label class="flex flex-col cursor-pointer">
+        <p class="text-sm leading-tight">
+          <span class="font-bold">
+            name
+          </span>
+          (optional)<span class="sr-only">;</span>
+          <span class="block">
+            will fall back to your username if not set
           </span>
         </p>
         <input
           type="text"
           name="name"
           maxlength="80"
-          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"
+          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground"
         />
       </label>
 
-      <label class="flex flex-col gap-1">
-        <p class="text-sm">
-          what do you do?
-          <span class="block text-gray-500">
+      <label class="flex flex-col cursor-pointer">
+        <p class="text-sm leading-tight">
+          <span class="font-bold">
+            what do you do?
+          </span>
+          <span class="sr-only">;</span>
+          <span class="block">
             for example: painter, software engineer, photographer, etc.
           </span>
         </p>
@@ -102,14 +102,17 @@ if (Astro.request.method === "POST") {
           name="does"
           maxlength="80"
           required
-          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"
+          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground"
         />
       </label>
 
-      <label class="flex flex-col gap-1">
-        <p class="text-sm">
-          website
-          <span class="block text-gray-500">
+      <label class="flex flex-col cursor-pointer">
+        <p class="text-sm leading-tight">
+          <span class="font-bold">
+            website
+          </span>
+          <span class="sr-only">;</span>
+          <span class="block">
             can also be a social media profile if you don't have one
           </span>
         </p>
@@ -118,15 +121,18 @@ if (Astro.request.method === "POST") {
           name="website"
           maxlength="255"
           required
-          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"
+          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground"
         />
       </label>
 
-      <label class="flex flex-col gap-1">
-        <p class="text-sm">
-          short bio
-          <span class="block text-gray-500">
-            for example: what are you passionate about and what do you like to do?
+      <label class="flex flex-col cursor-pointer">
+        <p class="text-sm leading-tight">
+          <span class="font-bold">
+            short bio
+          </span>
+          <span class="sr-only">;</span>
+          <span class="block">
+            a prompt: what are you passionate about? what is your purpose? what are you looking for in life?
           </span>
         </p>
         <textarea
@@ -134,10 +140,10 @@ if (Astro.request.method === "POST") {
           maxlength="240"
           required
           rows="4"
-          class="text-sm px-4 py-3 outline-none border border-gray-200 hover:border-gray-400 focus-visible:border-gray-500"></textarea>
+          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground resize-none"></textarea>
       </label>
 
-      <button class="bg-black text-white px-4 py-3 w-fit">submit</button>
+      <button class="px-4 py-3 w-fit outline-none font-bold text-sm border border-foreground/20 hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background">submit &rarr;</button>
     </form>
   </main>
 </Layout>

@@ -10,63 +10,63 @@ module.exports = plugin(({ addUtilities }) => {
 
 	addUtilities({
 		".font-thin": {
-			fontWeight: 100,
+			fontWeight: "normal",
 			fontVariationSettings: '"wght" 100',
 		},
 	})
 
 	addUtilities({
 		".font-extralight": {
-			fontWeight: 200,
+			fontWeight: "normal",
 			fontVariationSettings: '"wght" 200',
 		},
 	})
 
 	addUtilities({
 		".font-light": {
-			fontWeight: 300,
+			fontWeight: "normal",
 			fontVariationSettings: '"wght" 300',
 		},
 	})
 
 	addUtilities({
 		".font-normal": {
-			fontWeight: 400,
+			fontWeight: "normal",
 			fontVariationSettings: '"wght" 400',
 		},
 	})
 
 	addUtilities({
 		".font-medium": {
-			fontWeight: 500,
+			fontWeight: "normal",
 			fontVariationSettings: '"wght" 500',
 		},
 	})
 
 	addUtilities({
 		".font-semibold": {
-			fontWeight: 600,
+			fontWeight: "normal",
 			fontVariationSettings: '"wght" 600',
 		},
 	})
 
 	addUtilities({
 		".font-bold": {
-			fontWeight: 700,
+			fontWeight: "normal",
 			fontVariationSettings: '"wght" 700',
 		},
 	})
 
 	addUtilities({
 		".font-extrabold": {
-			fontWeight: 800,
+			fontWeight: "normal",
 			fontVariationSettings: '"wght" 800',
 		},
 	})
 
 	addUtilities({
 		".font-black": {
-			fontWeight: 900,
+			fontWeight: "normal",
 			fontVariationSettings: '"wght" 900',
 		},
 	})

@@ -13,16 +13,19 @@ const people = await db.query.people.findMany({
 ---
 
 <Layout title="Vancouver, BC">
-  <main class="max-w-2xl flex flex-col gap-10">
+  <main class="max-w-lg flex flex-col gap-10">
     <header>
-      <h1 class="text-xl">yvr.page</h1>
-      <p class="text-sm text-gray-600">
+      <h1 class="text-heading-three font-normal markdown-h1">yvr.page</h1>
+      <p class="text-sm leading-tight">
         a community site for meeting new folks in Vancouver, BC
       </p>
     </header>
 
-    <section class="flex flex-col gap-4">
-      <h2 class="text-lg flex-1"><a href="/people" class="hover:underline">people</a></h2>
+    <section class="flex-1 flex flex-col gap-2">
+      <h2 class="text-sm font-bold">
+        <a href="/people" class="internal-link">people</a>
+      </h2>
+      <span class="font-bold text-sm leading-none">--</span>
       <ul class="gap-4 flex flex-col">
         {people.map((person) => (
           <li>
@@ -35,6 +38,31 @@ const people = await db.query.people.findMany({
             />
           </li>
         ))}
+        {people.map((person) => (
+          <li>
+            <Person
+              username={person.username}
+              name={person.name ?? undefined}
+              does={person.does}
+              website={person.website}
+              bio={person.bio}
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="flex-1 flex flex-col gap-2">
+      <h2 class="text-sm font-bold">
+        <a href="/events" class="internal-link">events</a>
+      </h2>
+      <span class="font-bold text-sm leading-none">--</span>
+      <ul class="gap-4 flex flex-col">
+        <li>
+          <p class="text-sm leading-tight">
+            coming soon. dm <a href="/people/sk" class="font-bold internal-link">sam</a> if you're interested in hosting or sponsoring an event.
+          </p>
+        </li>
       </ul>
     </section>
   </main>

@@ -21,20 +21,23 @@ const pathname = new URL(Astro.request.url).pathname
   <body class="p-4 md:p-8 lg:p-12">
     <nav class="mb-12">
       <ul class="flex gap-6 text-sm">
-        <li>
-          {pathname === "/" ? <span class="underline">directory</span> : 
-          <a href="/" class="hover:text-gray-600">directory</a>
-        }
+        <li class="text-sm font-bold">
+          {pathname === "/"
+            ? <p class="active-link leading-tight">directory</p>
+            : <a href="/" class="block internal-link leading-tight">directory</a>
+          }
         </li>
-        <li>
-          {pathname === "/about" ? <span class="underline">about</span> : 
-          <a href="/about" class="hover:text-gray-600">about</a>
-        }
+        <li class="text-sm font-bold">
+          {pathname === "/about"
+            ? <p class="active-link leading-tight">about</p>
+            : <a href="/about" class="block internal-link leading-tight">about</a>
+          }
         </li>
-        <li>
-          {pathname === "/submit" ? <span class="underline">submit</span> : 
-          <a href="/submit" class="hover:text-gray-600">submit</a>
-        }
+        <li class="text-sm font-bold">
+          {pathname === "/submit"
+            ? <p class="active-link leading-tight">submit</p>
+            : <a href="/submit" class="block internal-link leading-tight">submit</a>
+          }
         </li>
       </ul>
     </nav>
@@ -51,6 +54,19 @@ const pathname = new URL(Astro.request.url).pathname
     font-display: swap;
   }
 
+  :root {
+    --foreground: 240, 10%, 10%;
+    --background: 40, 10%, 98%;
+  }
+  
+  
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --foreground: 240, 10%, 90%;
+      --background: 40, 10%, 4%;
+    }
+  }
+  
   html {
     font-size: 14px;
   }
@@ -59,5 +75,21 @@ const pathname = new URL(Astro.request.url).pathname
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "ss01", "ss03", "ss04", "ss05";
+    background: hsla(var(--background), 1);
+    color: hsla(var(--foreground), 1);
+  }
+
+  .invert {
+    --foreground: var(--background);
+    --background: var(--foreground);
+  }
+
+  .active-link {
+    @apply text-background bg-foreground;
+  }
+
+  .internal-link {
+    @apply hover:text-background hover:bg-foreground;
+    @apply focus-visible:text-background focus-visible:bg-foreground outline-none;
   }
 </style>
