@@ -1,0 +1,118 @@
+---
+import Button from "@components/Button.astro"
+import Heading from "@components/Heading.astro"
+import Paragraph from "@components/Paragraph.astro"
+import Person from "@components/Person.astro"
+import { schema } from "@db/index"
+import { reviewProfileSchema } from "@db/validation"
+import Layout from "@layouts/Layout.astro"
+import { eq } from "drizzle-orm"
+import * as v from "valibot"
+
+const { db, session } = Astro.locals
+
+if (!session) {
+	return Astro.redirect("/auth/login", 302)
+}
+
+const user = await db.query.users.findFirst({
+	where: (u, { eq }) => eq(u.id, session.userId),
+	columns: {
+		role: true,
+	},
+})
+
+if (user?.role !== "admin") {
+	return Astro.redirect("/profile", 403)
+}
+
+const needsApproval = await db.query.profiles.findMany({
+	where: (p, { and, isNull }) =>
+		and(isNull(p.approvedAt), isNull(p.rejectedAt)),
+	columns: {
+		id: true,
+		username: true,
+		name: true,
+		does: true,
+		website: true,
+		bio: true,
+	},
+})
+
+if (Astro.request.method === "POST") {
+	try {
+		const data = await Astro.request.formData()
+		const unsafeId = data.get("id")
+		const unsafeStatus = data.get("status")
+
+		const parsed = v.safeParse(reviewProfileSchema, {
+			id: unsafeId,
+			status: unsafeStatus,
+		})
+
+		if (!parsed.success) {
+			console.error(parsed.issues)
+			return Astro.redirect("/admin", 400)
+		}
+
+		const { id, status } = parsed.output
+		await db
+			.update(schema.profiles)
+			.set({
+				approvedAt: status === "approved" ? Date.now() : null,
+				rejectedAt: status === "rejected" ? Date.now() : null,
+			})
+			.where(eq(schema.profiles.id, id.toString()))
+
+		return Astro.redirect("/admin")
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error.message)
+		}
+	}
+}
+---
+
+<Layout title="admin">
+  <main class="max-w-xl flex flex-col gap-10">
+    <header class="flex flex-col gap-2">
+      <Heading level="h1">admin</Heading>
+    </header>
+
+    <section class="flex flex-col gap-8">
+      <header class="flex flex-col gap-2">
+        <Heading level="h2" class="flex-1">needs approval</Heading>
+        <Paragraph class="text-sm">
+          {needsApproval.length} profiles need approval
+        </Paragraph>
+      </header>
+
+      <ul class="gap-8 flex flex-col">
+        {needsApproval.map((profile) => (
+          <li>
+            <Person
+              username={profile.username}
+              name={profile.name}
+              does={profile.does}
+              website={profile.website}
+              bio={profile.bio}
+            />
+
+            <div class="flex gap-2 mt-2">
+              <form method="POST">
+                <input type="hidden" name="id" value={profile.id} />
+                <input type="hidden" name="status" value="approved" />
+                <Button type="submit">approve</Button>
+              </form>
+              <form method="POST">
+                <input type="hidden" name="id" value={profile.id} />
+                <input type="hidden" name="status" value="rejected" />
+                <Button type="submit">reject</Button>
+              </form>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </main>
+</Layout>
