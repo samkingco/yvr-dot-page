@@ -1,10 +1,14 @@
 ---
+import Heading from "../../components/Heading.astro"
+import Paragraph from "../../components/Paragraph.astro"
 import Layout from "../../layouts/Layout.astro"
 ---
 
 <Layout title="submission successful">
   <main class="max-w-lg">
-    <h1 class="text-heading-three font-normal">submitted</h1>
-    <p class="text-sm leading-tight">we usually review and publish profiles within a few days, so check back soon!</p>
+    <Heading level="h2">submission received!</Heading>
+    <Paragraph class="text-sm">
+      we usually review and publish profiles within a few days, so check back soon
+    </Paragraph>
   </main>
 </Layout>

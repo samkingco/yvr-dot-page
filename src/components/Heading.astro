@@ -1,0 +1,23 @@
+---
+import { cn } from "../utils"
+
+type Props = {
+	class?: string
+	level: "h1" | "h2" | "h3"
+	asLevel?: "h1" | "h2" | "h3"
+}
+
+const { class: _className, level, asLevel = level } = Astro.props
+
+const className = cn(
+	level === "h1" && "font-normal leading-tight text-heading-one",
+	level === "h2" && "font-bold leading-snug text-heading-two",
+	level === "h3" && "font-bold leading-snug text-heading-three",
+	_className,
+)
+---
+<>
+  {asLevel === "h1" && <h1 class={className}><slot /></h1>}
+  {asLevel === "h2" && <h2 class={className}><slot /></h2>}
+  {asLevel === "h3" && <h3 class={className}><slot /></h3>}
+</>

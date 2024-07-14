@@ -1,5 +1,7 @@
 ---
 import { drizzle } from "drizzle-orm/d1"
+import Heading from "../../components/Heading.astro"
+import Paragraph from "../../components/Paragraph.astro"
 import Person from "../../components/Person.astro"
 import { schema } from "../../db"
 import Layout from "../../layouts/Layout.astro"
@@ -30,15 +32,15 @@ const displayUrl = new URL(person.website).hostname
 <Layout title={name}>
   <main class="max-w-lg flex flex-col gap-4">
     <header>
-      <h1 class="text-heading-three font-normal">{name}</h1>
-      <p class="text-sm leading-tight">
+      <Heading level="h1">{name}</Heading>
+      <Paragraph class="text-sm">
         {person.does}
-      </p>
-      <p class="text-sm leading-tight">
+      </Paragraph>
+      <Paragraph class="text-sm">
         <a href={person.website} class="internal-link underline decoration-foreground/20">{displayUrl}</a>
-      </p>
+      </Paragraph>
     </header>
 
-    <p class="text-sm leading-tight">{person.bio}</p>
+    <Paragraph class="text-sm">{person.bio}</Paragraph>
   </main>
 </Layout>

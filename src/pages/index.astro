@@ -1,5 +1,7 @@
 ---
 import { drizzle } from "drizzle-orm/d1"
+import Heading from "../components/Heading.astro"
+import Paragraph from "../components/Paragraph.astro"
 import Person from "../components/Person.astro"
 import { schema } from "../db"
 import Layout from "../layouts/Layout.astro"
@@ -15,16 +17,16 @@ const people = await db.query.people.findMany({
 <Layout title="Vancouver, BC">
   <main class="max-w-lg flex flex-col gap-10">
     <header>
-      <h1 class="text-heading-three font-normal markdown-h1">yvr.page</h1>
-      <p class="text-sm leading-tight">
+      <Heading level="h1">yvr.page</Heading>
+      <Paragraph class="text-sm">
         a community site for meeting new folks in Vancouver, BC
-      </p>
+      </Paragraph>
     </header>
 
     <section class="flex-1 flex flex-col gap-2">
-      <h2 class="text-sm font-bold">
+      <Heading level="h2">
         <a href="/people" class="internal-link">people</a>
-      </h2>
+      </Heading>
       <span class="font-bold text-sm leading-none">--</span>
       <ul class="gap-4 flex flex-col">
         {people.map((person) => (
@@ -42,17 +44,13 @@ const people = await db.query.people.findMany({
     </section>
 
     <section class="flex-1 flex flex-col gap-2">
-      <h2 class="text-sm font-bold">
+      <Heading level="h2">
         <a href="/events" class="internal-link">events</a>
-      </h2>
+      </Heading>
       <span class="font-bold text-sm leading-none">--</span>
-      <ul class="gap-4 flex flex-col">
-        <li>
-          <p class="text-sm leading-tight">
-            coming soon. dm <a href="/people/sk" class="font-bold internal-link">sam</a> if you're interested in hosting or sponsoring an event.
-          </p>
-        </li>
-      </ul>
+      <Paragraph class="text-sm">
+        coming soon. dm <a href="/people/sk" class="font-bold internal-link">sam</a> if you're interested in hosting or sponsoring an event.
+      </Paragraph>
     </section>
   </main>
 </Layout>

@@ -56,18 +56,4 @@ module.exports = plugin(({ addUtilities }) => {
 			fontVariationSettings: '"wght" 700',
 		},
 	})
-
-	addUtilities({
-		".font-extrabold": {
-			fontWeight: "normal",
-			fontVariationSettings: '"wght" 800',
-		},
-	})
-
-	addUtilities({
-		".font-black": {
-			fontWeight: "normal",
-			fontVariationSettings: '"wght" 900',
-		},
-	})
 })

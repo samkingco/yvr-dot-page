@@ -1,5 +1,6 @@
 ---
 import { drizzle } from "drizzle-orm/d1"
+import Heading from "../../components/Heading.astro"
 import Person from "../../components/Person.astro"
 import { schema } from "../../db"
 import Layout from "../../layouts/Layout.astro"
@@ -14,8 +15,7 @@ const people = await db.query.people.findMany({
 
 <Layout title="people of yvr.page">
   <main class="max-w-lg flex flex-col gap-10">
-    <h1 class="text-heading-three font-normal">people</h1>
-
+    <Heading level="h1">people</Heading>
     <ul class="gap-4 flex flex-col">
       {people.map((person) => (
         <li>

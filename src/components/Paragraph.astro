@@ -1,0 +1,18 @@
+---
+import { cn } from "../utils"
+
+type Props = {
+	class?: string
+	asSpan?: boolean
+}
+
+const { class: _className, asSpan } = Astro.props
+
+const className = cn("leading-snug", _className)
+---
+<>
+  {asSpan 
+    ? <span class={className}><slot /></span>
+    : <p class={className}><slot /></p>
+  }
+</>

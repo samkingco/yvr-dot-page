@@ -1,43 +1,45 @@
 ---
+import Heading from "../components/Heading.astro"
+import Paragraph from "../components/Paragraph.astro"
 import Layout from "../layouts/Layout.astro"
 ---
 
 <Layout title="about yvr.page">
   <main class="max-w-lg flex flex-col gap-10">
     <header>
-      <h1 class="text-heading-three font-normal">about</h1>
-      <p class="text-sm leading-tight">
+      <Heading level="h1">about</Heading>
+      <Paragraph class="text-sm">
         yvr.page is a directory of people and their events in Vancouver. you can use the directory to find interesting people, start conversations, and meet up.
-      </p>
+      </Paragraph>
     </header>
     
     <section>
-      <h2 class="text-sm flex-1 font-bold">why?</h2>
-      <p class="text-sm leading-tight">
+      <Heading level="h2" class="flex-1">why?</Heading>
+      <Paragraph class="text-sm">
         meeting new people in this city can be tough, especially if you're new. we wanted a place where we could find like-minded people who are into art, technology, music, and other creative pursits. a place where you could organize mini events, workshops, or just hang out at the park.
-      </p>
+      </Paragraph>
     </section>
 
 
     <section>
-      <h2 class="text-sm flex-1 font-bold">how?</h2>
-      <p class="text-sm leading-tight">
+      <Heading level="h2" class="flex-1">how?</Heading>
+      <Paragraph class="text-sm">
         you can <a href="/submit" class="internal-link font-bold">submit</a> your profile info, and someone will review it and add you to the directory. if you want to meet others, their websites or social profiles are linked in the directory. we may add a way for people to message each other from the directory, but for now, just use the websites.
-      </p>
+      </Paragraph>
     </section>
 
     <section>
-      <h2 class="text-sm flex-1 font-bold">vibe check?</h2>
-      <p class="text-sm leading-tight">
-        every person in the directory has been vetted by a few people already in the community. we want to ensure that everyone feels comfortable and safe meeting up with each other. we're keeping the community relatively small to start, but we're open to ideas on how to improve the vibe check over time, and increase the size of the group.
-      </p>
+      <Heading level="h2" class="flex-1">vibe check?</Heading>
+      <Paragraph class="text-sm">
+        every profile in the directory has been reviewed by someone in the community. we want to ensure that everyone feels comfortable and safe meeting up with each other. we're keeping the community relatively small to start, but we're open to ideas on how to improve the vibe check over time, and increase the size of the group.
+      </Paragraph>
     </section>
     
     <section>
-      <h2 class="text-sm flex-1 font-bold">open source</h2>
-      <p class="text-sm leading-tight">
+      <Heading level="h2" class="flex-1">open source</Heading>
+      <Paragraph class="text-sm">
         this website is open source under the <a href="https://opensource.org/license/mit" class="internal-link font-bold">MIT license</a> if others want to contribute, or fork for their own city. the code is available on <a href="https://github.com/samkingco/yvr-dot-page" class="internal-link font-bold">github</a>. the only thing that is not open source is the data itself, which is stored in a private database.
-      </p>
+      </Paragraph>
     </section>
   </main>
 </Layout>

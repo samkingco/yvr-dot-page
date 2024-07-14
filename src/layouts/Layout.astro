@@ -1,4 +1,6 @@
 ---
+import Paragraph from "../components/Paragraph.astro"
+
 interface Props {
 	title: string
 }
@@ -18,26 +20,32 @@ const pathname = new URL(Astro.request.url).pathname
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="p-4 md:p-8 lg:p-12">
+  <body class="pt-8 pb-16 px-4 md:px-8 lg:px-12 lg:pt-12">
     <nav class="mb-12">
       <ul class="flex gap-6 text-sm">
-        <li class="text-sm font-bold">
-          {pathname === "/"
-            ? <p class="active-link leading-tight">directory</p>
-            : <a href="/" class="block internal-link leading-tight">directory</a>
-          }
+        <li>
+          <Paragraph class="text-sm font-bold">
+            {pathname === "/"
+              ? <span class="active-link">directory</span>
+              : <a href="/" class="internal-link">directory</a>
+            }
+          </Paragraph>
         </li>
-        <li class="text-sm font-bold">
-          {pathname === "/about"
-            ? <p class="active-link leading-tight">about</p>
-            : <a href="/about" class="block internal-link leading-tight">about</a>
-          }
+        <li>
+          <Paragraph class="text-sm font-bold">
+            {pathname === "/about"
+              ? <span class="active-link">about</span>
+              : <a href="/about" class="internal-link">about</a>
+            }
+          </Paragraph>
         </li>
-        <li class="text-sm font-bold">
-          {pathname === "/submit"
-            ? <p class="active-link leading-tight">submit</p>
-            : <a href="/submit" class="block internal-link leading-tight">submit</a>
-          }
+        <li>
+          <Paragraph class="text-sm font-bold">
+            {pathname === "/submit"
+              ? <span class="active-link">submit</span>
+              : <a href="/submit" class="internal-link">submit</a>
+            }
+          </Paragraph>
         </li>
       </ul>
     </nav>
@@ -86,10 +94,13 @@ const pathname = new URL(Astro.request.url).pathname
 
   .active-link {
     @apply text-background bg-foreground;
+    @apply px-0.5 -mx-0.5;
   }
 
   .internal-link {
     @apply hover:text-background hover:bg-foreground;
     @apply focus-visible:text-background focus-visible:bg-foreground outline-none;
+    @apply px-0.5 -mx-0.5;
+    @apply motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out;
   }
 </style>

@@ -1,4 +1,7 @@
 ---
+import Heading from "./Heading.astro"
+import Paragraph from "./Paragraph.astro"
+
 interface Props {
 	username: string
 	name?: string
@@ -12,12 +15,12 @@ const { username, name, does, website, bio } = Astro.props
 
 <div>
   <div class="flex gap-2 items-baseline">
-    <h3 class="text-sm font-bold">
+    <Heading level="h3">
       <a href={website}>{name ?? `@${username}`}</a>
-    </h3>
-    <p class="text-sm leading-tight">
+    </Heading>
+    <Paragraph class="text-sm">
       &ndash; {does}
-    </p>
+    </Paragraph>
   </div>
-  <p class="text-sm leading-tight">{bio}</p>
+  <Paragraph class="text-sm">{bio}</Paragraph>
 </div>

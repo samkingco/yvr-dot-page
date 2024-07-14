@@ -1,6 +1,7 @@
 ---
 import { drizzle } from "drizzle-orm/d1"
 import * as v from "valibot"
+import Paragraph from "../../components/Paragraph.astro"
 import { schema, validation } from "../../db"
 import Layout from "../../layouts/Layout.astro"
 
@@ -50,27 +51,27 @@ if (Astro.request.method === "POST") {
   <main class="flex flex-col cursor-pointer">
     <form method="POST" class="flex flex-col gap-8 max-w-lg">
       <label class="flex flex-col cursor-pointer">
-        <p class="text-sm leading-tight">
+        <Paragraph class="text-sm">
           <span class="font-bold">
             username
           </span>
           <span class="sr-only">;</span>
           <span class="block">
-            used in your profile URL e.g. yvr.page/people/mr-peanut
+            used in your url e.g. /people/<span class="font-bold" data-username-placeholder>mr-peanut</span>
           </span>
-        </p>
+        </Paragraph>
         <input
           type="text"
           name="username"
           required
           minlength="2"
           maxlength="32"
-          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground"
+          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
         />
       </label>
       
       <label class="flex flex-col cursor-pointer">
-        <p class="text-sm leading-tight">
+        <Paragraph class="text-sm">
           <span class="font-bold">
             name
           </span>
@@ -78,17 +79,17 @@ if (Astro.request.method === "POST") {
           <span class="block">
             will fall back to your username if not set
           </span>
-        </p>
+        </Paragraph>
         <input
           type="text"
           name="name"
           maxlength="80"
-          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground"
+          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out placeholder:text-foreground/30"
         />
       </label>
 
       <label class="flex flex-col cursor-pointer">
-        <p class="text-sm leading-tight">
+        <Paragraph class="text-sm">
           <span class="font-bold">
             what do you do?
           </span>
@@ -96,18 +97,18 @@ if (Astro.request.method === "POST") {
           <span class="block">
             for example: painter, software engineer, photographer, etc.
           </span>
-        </p>
+        </Paragraph>
         <input
           type="text"
           name="does"
           maxlength="80"
           required
-          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground"
+          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
         />
       </label>
 
       <label class="flex flex-col cursor-pointer">
-        <p class="text-sm leading-tight">
+        <Paragraph class="text-sm">
           <span class="font-bold">
             website
           </span>
@@ -115,18 +116,18 @@ if (Astro.request.method === "POST") {
           <span class="block">
             can also be a social media profile if you don't have one
           </span>
-        </p>
+        </Paragraph>
         <input
           type="url"
           name="website"
           maxlength="255"
           required
-          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground"
+          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
         />
       </label>
 
       <label class="flex flex-col cursor-pointer">
-        <p class="text-sm leading-tight">
+        <Paragraph class="text-sm">
           <span class="font-bold">
             short bio
           </span>
@@ -134,16 +135,37 @@ if (Astro.request.method === "POST") {
           <span class="block">
             a prompt: what are you passionate about? what is your purpose? what are you looking for in life?
           </span>
-        </p>
+        </Paragraph>
         <textarea
           name="bio"
           maxlength="240"
           required
           rows="4"
-          class="text-sm leading-tight py-3 outline-none bg-background border-b border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground resize-none"></textarea>
+          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out resize-none"></textarea>
       </label>
 
-      <button class="px-4 py-3 w-fit outline-none font-bold text-sm border border-foreground/20 hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background">submit &rarr;</button>
+      <button class="px-4 py-3 w-fit outline-none font-bold text-sm border-2 border-foreground/20 hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background motion-safe:transition-colors motion-safe:duration-100 motion-safe:ease-out">submit &rarr;</button>
     </form>
   </main>
 </Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const usernamePlaceholder = document.querySelector<HTMLSpanElement>('[data-username-placeholder]')
+    const usernameInput = document.querySelector<HTMLInputElement>('input[name="username"]')
+    const nameInput = document.querySelector<HTMLInputElement>('input[name="name"]')
+    
+    function onInputChange() {
+      if (usernamePlaceholder && usernameInput) {
+        const inputValue = usernameInput.value.trim()
+        usernamePlaceholder.textContent = inputValue || "mr-peanut"
+      }
+
+      if (usernameInput && nameInput) {
+        nameInput.placeholder = usernameInput.value.trim()
+      }
+    }
+
+    usernameInput?.addEventListener('input', onInputChange)
+  });
+</script>

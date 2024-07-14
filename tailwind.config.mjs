@@ -7,9 +7,9 @@ export default {
 		},
 		fontSize: {
 			DEFAULT: "1rem",
-			"heading-one": "3rem",
-			"heading-two": "2rem",
-			"heading-three": "1.6rem",
+			"heading-one": "1.6rem",
+			"heading-two": "0.875rem",
+			"heading-three": "0.875rem",
 			xl: "1.375rem",
 			lg: "1.125rem",
 			md: "1rem",
