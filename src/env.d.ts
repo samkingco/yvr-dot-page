@@ -5,6 +5,7 @@ type Env = {
 	ENVIRONMENT?: "preview" | "production"
 	DB: D1Database
 	RESEND_API_KEY: string
+	WEATHER_API_KEY: string
 }
 
 type Runtime = import("@astrojs/cloudflare").Runtime<Env>
