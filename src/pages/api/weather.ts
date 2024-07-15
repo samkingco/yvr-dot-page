@@ -51,10 +51,9 @@ export const POST: APIRoute = async (context) => {
 		return new Response("No signature found", { status: 403 })
 	}
 
-	const body = await context.request.json()
 	const isValid = receiver.verify({
 		signature,
-		body: JSON.stringify(body),
+		body: JSON.stringify(context.request.body),
 		url: context.request.url,
 	})
 
