@@ -24,6 +24,19 @@ if (session) {
 	})
 	isAdmin = user?.role === "admin"
 }
+
+const weather = await db.query.weather.findFirst({
+	orderBy: (table, { desc }) => desc(table.createdAt),
+	columns: {
+		description: true,
+		temp: true,
+	},
+})
+
+let weatherString = ""
+if (weather) {
+	weatherString = `${weather.description.toLowerCase()} • ${weather.temp}C`
+}
 ---
 
 <!doctype html>
@@ -124,8 +137,11 @@ if (session) {
     </div>
     <footer class="fixed bottom-0 left-0 w-full h-[--footer-size] pointer-events-none bg-gradient-to-b from-transparent to-background to-50% flex flex-col justify-end items-end">
       <div class="flex gap-4 pointer-events-auto px-4 md:px-8 lg:px-12 pb-4">
-        <Paragraph class="text-sm" data-current-time>
-          00:00:00
+        <Paragraph class="text-sm">
+          {weatherString && (
+            <>{weatherString} &bull; </>
+          )}
+          <span data-current-time>00:00:00</span>
         </Paragraph>
       </div>
     </footer>
