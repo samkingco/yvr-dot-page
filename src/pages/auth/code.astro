@@ -4,12 +4,14 @@ import Input from "@components/Input.astro"
 import Paragraph from "@components/Paragraph.astro"
 import { id, schema, validation } from "@db/index"
 import Layout from "@layouts/Layout.astro"
+import { M } from "dist/_worker.js/chunks/astro/env-setup_DQkCwUzq.mjs"
 import { eq } from "drizzle-orm"
 import { isWithinExpirationDate } from "oslo"
 import * as v from "valibot"
 
 const initialValues = {
 	email: Astro.url.searchParams.get("email") ?? "",
+	mailingList: Astro.url.searchParams.get("ml") === "true",
 }
 
 if (!initialValues.email) {
@@ -28,6 +30,7 @@ if (Astro.request.method === "POST") {
 		const data = await Astro.request.formData()
 		const unsafeEmail = data.get("email")?.toString() ?? ""
 		const unsafeCode = data.get("code")?.toString() ?? ""
+		const unsafeMailingList = data.get("ml")?.toString() === "1"
 
 		const returnUrl = new URL(Astro.url.pathname, Astro.url.origin)
 		returnUrl.searchParams.set("email", unsafeEmail)
@@ -35,6 +38,7 @@ if (Astro.request.method === "POST") {
 		const parsed = v.safeParse(validation.verifyCodeSchema, {
 			email: unsafeEmail,
 			code: unsafeCode.replace(/[^0-9]/g, ""),
+			mailingList: unsafeMailingList,
 		})
 
 		if (!parsed.success) {
@@ -49,7 +53,7 @@ if (Astro.request.method === "POST") {
 			return Astro.redirect(returnUrl.toString())
 		}
 
-		const { email, code } = parsed.output
+		const { email, code, mailingList } = parsed.output
 
 		const verification = await db.query.emailVerifications.findFirst({
 			where: (e, { and, eq }) => and(eq(e.email, email), eq(e.code, code)),
@@ -94,6 +98,7 @@ if (Astro.request.method === "POST") {
 				createdAt: Date.now(),
 				updatedAt: Date.now(),
 				role: "user",
+				mailingList,
 			})
 
 			return userId
@@ -133,6 +138,7 @@ if (Astro.request.method === "POST") {
 
     <form method="POST" class="flex flex-col gap-8">
       <input type="hidden" name="email" value={initialValues.email} />
+      <input type="hidden" name="ml" value={initialValues.mailingList ? "1" : "0"} />
 
       <label class="flex flex-col cursor-pointer">
         <Paragraph class="text-sm">

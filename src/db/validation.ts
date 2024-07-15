@@ -25,6 +25,7 @@ export const verifyCodeSchema = v.object({
 		v.minLength(1, "code is required"),
 		v.maxLength(6, "code must be 6 characters or less"),
 	),
+	mailingList: v.optional(v.boolean(), false),
 })
 
 export const reviewProfileSchema = v.object({
