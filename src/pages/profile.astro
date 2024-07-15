@@ -3,7 +3,7 @@ import Button from "@components/Button.astro"
 import Heading from "@components/Heading.astro"
 import Input from "@components/Input.astro"
 import Paragraph from "@components/Paragraph.astro"
-import Textarea from "@components/Textarea.astro"
+import { textareaClassName } from "@components/element-styles"
 import { id, schema, validation } from "@db/index"
 import Layout from "@layouts/Layout.astro"
 import { eq } from "drizzle-orm"
@@ -211,7 +211,7 @@ if (Astro.request.method === "POST") {
             a prompt: what are you passionate about? what is your purpose? what are you looking for in life?
           </span>
         </Paragraph>
-        <Textarea name="bio" rows="4" >{profile?.bio ?? ""}</Textarea>
+        <textarea name="bio" rows="4" class={textareaClassName()}>{profile?.bio ?? ""}</textarea>
       </label>
 
       <Button type="submit">save</Button>
