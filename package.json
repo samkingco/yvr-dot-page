@@ -17,6 +17,7 @@
 		"@astrojs/cloudflare": "^11.0.1",
 		"@astrojs/tailwind": "^5.1.0",
 		"@lucia-auth/adapter-drizzle": "^1.0.7",
+		"@upstash/qstash": "^2.6.1",
 		"astro": "^4.11.5",
 		"clsx": "^2.1.1",
 		"cron-schedule": "^5.0.1",

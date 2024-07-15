@@ -6,6 +6,10 @@ type Env = {
 	DB: D1Database
 	RESEND_API_KEY: string
 	WEATHER_API_KEY: string
+	QSTASH_URL: string
+	QSTASH_TOKEN: string
+	QSTASH_CURRENT_SIGNING_KEY: string
+	QSTASH_NEXT_SIGNING_KEY: string
 }
 
 type Runtime = import("@astrojs/cloudflare").Runtime<Env>

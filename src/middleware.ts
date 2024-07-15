@@ -5,7 +5,9 @@ import { verifyRequestOrigin } from "lucia"
 import { Resend } from "resend"
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
-	if (context.request.method !== "GET") {
+	const isUpstashRequest = context.request.headers.has("Upstash-Signature")
+
+	if (context.request.method !== "GET" && !isUpstashRequest) {
 		const originHeader = context.request.headers.get("Origin")
 		const hostHeader = context.request.headers.get("Host")
 		if (
