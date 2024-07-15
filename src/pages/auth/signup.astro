@@ -1,5 +1,7 @@
 ---
 import Button from "@components/Button.astro"
+import Checkbox from "@components/Checkbox.astro"
+import Input from "@components/Input.astro"
 import Paragraph from "@components/Paragraph.astro"
 import { emailAuthCode, id, schema, validation } from "@db/index"
 import Layout from "@layouts/Layout.astro"
@@ -111,21 +113,11 @@ if (Astro.request.method === "POST") {
             we'll send you a code to sign up, no password required
           </span>
         </Paragraph>
-        <input
-          type="text"
-					inputmode="email"
-          name="email"
-					value={initialValues.email}
-          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
-        />
+        <Input type="text" inputmode="email" name="email" value={initialValues.email} />
       </label>
 
       <label class="flex flex-row gap-4 items-start cursor-pointer">
-        <input
-          type="checkbox"
-          name="mailingList"
-          class="mt-0.5 appearance-none w-4 h-4 outline-none bg-background border-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground checked:bg-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
-        />
+        <Checkbox name="mailingList" class="mt-0.5" />
         <Paragraph class="text-sm">
           <span class="font-bold">
             join the mailing list

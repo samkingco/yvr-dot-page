@@ -1,5 +1,6 @@
 ---
 import Button from "@components/Button.astro"
+import Input from "@components/Input.astro"
 import Paragraph from "@components/Paragraph.astro"
 import { emailAuthCode, id, schema, validation } from "@db/index"
 import Layout from "@layouts/Layout.astro"
@@ -108,13 +109,7 @@ if (Astro.request.method === "POST") {
             we'll send you a code to log in, no password required
           </span>
         </Paragraph>
-        <input
-          type="text"
-					inputmode="email"
-          name="email"
-					value={initialValues.email}
-          class="text-sm leading-snug py-3 outline-none bg-background border-b-2 border-foreground/20 hover:border-foreground/30 focus-visible:border-foreground motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out"
-        />
+        <Input type="text" inputmode="email" name="email" value={initialValues.email} />
       </label>
       
       <Button type="submit">log in</Button>

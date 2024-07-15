@@ -100,12 +100,18 @@ if (session) {
         <ul class="flex gap-6 text-sm">
           <li>
             <Paragraph class="font-bold">
-              <a href="/auth/login" class="internal-link">login</a>
+              {pathname === "/auth/login"
+                ? <span class="active-link">log in</span>
+                : <a href="/auth/login" class="internal-link">log in</a>
+              }
             </Paragraph>
           </li>
           <li>
             <Paragraph class="font-bold">
-              <a href="/auth/signup" class="internal-link">sign up</a>
+              {pathname === "/auth/signup"
+                ? <span class="active-link">sign up</span>
+                : <a href="/auth/signup" class="internal-link">sign up</a>
+              }
             </Paragraph>
           </li>
         </ul>
