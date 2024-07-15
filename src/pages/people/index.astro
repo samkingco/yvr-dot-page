@@ -7,6 +7,7 @@ const { db } = Astro.locals
 
 const people = await db.query.profiles.findMany({
 	where: (p, { isNotNull }) => isNotNull(p.approvedAt),
+	orderBy: (table, { asc }) => asc(table.name),
 	columns: {
 		username: true,
 		name: true,
