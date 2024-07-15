@@ -1,4 +1,5 @@
 ---
+import { formatWebsite } from "@utils"
 import Heading from "./Heading.astro"
 import Paragraph from "./Paragraph.astro"
 
@@ -10,8 +11,8 @@ interface Props {
 	bio: string
 }
 
-const { username, name, does, website, bio } = Astro.props
-const displayUrl = new URL(website).hostname
+const { username, name, does, website: websiteHref, bio } = Astro.props
+const website = formatWebsite(websiteHref)
 ---
 
 <div>
@@ -22,7 +23,7 @@ const displayUrl = new URL(website).hostname
     <Paragraph>{does}</Paragraph>
     <Paragraph>&ndash;</Paragraph>
     <Paragraph>
-      <a href={website} class="internal-link">{displayUrl}</a>
+      <a href={websiteHref} class="internal-link">{website}</a>
     </Paragraph>
   </div>
   <Paragraph class="text-sm mt-2">{bio}</Paragraph>
