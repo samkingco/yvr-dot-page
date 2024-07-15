@@ -14,7 +14,7 @@ export function formatWebsite(website: string) {
 			/(?:https?:\/\/)?(?:www\.)?twitter\.com\/(?:#!\/)?@?([^/?\s]*)/,
 		).exec(website)
 		if (match?.[1]) {
-			formattedWebsite = `twitter @${match[1]}`
+			formattedWebsite = `twitter.com/${match[1]}`
 		}
 	}
 
@@ -23,7 +23,7 @@ export function formatWebsite(website: string) {
 			/(?:https?:\/\/)?(?:www\.)?x\.com\/(?:#!\/)?@?([^/?\s]*)/,
 		).exec(website)
 		if (match?.[1]) {
-			formattedWebsite = `x @${match[1]}`
+			formattedWebsite = `x.com/${match[1]}`
 		}
 	}
 
@@ -32,7 +32,7 @@ export function formatWebsite(website: string) {
 			/(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:#!\/)?@?([^/?\s]*)/,
 		).exec(website)
 		if (match?.[1]) {
-			formattedWebsite = `ig @${match[1]}`
+			formattedWebsite = `instagram.com/${match[1]}`
 		}
 	}
 
@@ -41,7 +41,7 @@ export function formatWebsite(website: string) {
 			/(?:https?:\/\/)?(?:www\.)?threads\.net\/(?:#!\/)?@?([^/?\s]*)/,
 		).exec(website)
 		if (match?.[1]) {
-			formattedWebsite = `threads @${match[1]}`
+			formattedWebsite = `threads.net/${match[1]}`
 		}
 	}
 

@@ -2,6 +2,7 @@
 import Heading from "@components/Heading.astro"
 import Paragraph from "@components/Paragraph.astro"
 import Layout from "@layouts/Layout.astro"
+import { formatWebsite } from "@utils"
 
 const { username } = Astro.params
 if (!username) {
@@ -22,7 +23,7 @@ if (!person) {
 }
 
 const name = person.name ?? `@${person.username}`
-const displayUrl = new URL(person.website).hostname
+const formattedWebsite = formatWebsite(person.website)
 ---
 
 <Layout title={name}>
@@ -33,7 +34,7 @@ const displayUrl = new URL(person.website).hostname
         {person.does}
       </Paragraph>
       <Paragraph class="text-sm">
-        <a href={person.website} class="internal-link font-bold">{displayUrl}</a>
+        <a href={person.website} class="internal-link font-bold">{formattedWebsite}</a>
       </Paragraph>
     </header>
 
