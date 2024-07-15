@@ -8,6 +8,7 @@ const prefixes = {
 	emailVerification: "evf",
 	profile: "pro",
 	event: "evt",
+	weather: "weather",
 } as const
 
 export function id<TPrefix extends keyof typeof prefixes>(

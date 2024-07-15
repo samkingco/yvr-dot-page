@@ -66,3 +66,23 @@ export const profiles = sqliteTable(
 		username: uniqueIndex("profile_username_unique").on(table.username),
 	}),
 )
+
+export const weather = sqliteTable(
+	"weather",
+	{
+		id: text("id").notNull().primaryKey(),
+		createdAt: integer("created_at").notNull(),
+		description: text("description", { length: 240 }).notNull(),
+		temp: integer("temp").notNull(),
+		feelsLike: integer("feels_like").notNull(),
+		min: integer("min").notNull(),
+		max: integer("max").notNull(),
+		pressure: integer("pressure").notNull(),
+		humidity: integer("humidity").notNull(),
+		sunrise: integer("sunrise").notNull(),
+		sunset: integer("sunset").notNull(),
+	},
+	(table) => ({
+		id: uniqueIndex("weather_id_index").on(table.id),
+	}),
+)

@@ -43,6 +43,13 @@
       "when": 1720989335011,
       "tag": "0005_misty_tigra",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1721031437937,
+      "tag": "0006_right_kinsey_walden",
+      "breakpoints": true
     }
   ]
 }
