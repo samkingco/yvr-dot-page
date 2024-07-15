@@ -48,78 +48,89 @@ if (session) {
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@yvrdotpage" />
   </head>
-  <body class="pt-8 pb-16 px-4 md:px-8 lg:px-12 lg:pt-12">
-    <nav class="mb-12 flex gap-4">
-      <ul class="flex-1 flex gap-6 text-sm font-bold">
-        <li>
-          <Paragraph>
-            {pathname === "/"
-              ? <span class="active-link">directory</span>
-              : <a href="/" class="internal-link">directory</a>
-            }
-          </Paragraph>
-        </li>
-        <li>
-          <Paragraph>
-            {pathname === "/about"
-              ? <span class="active-link">about</span>
-              : <a href="/about" class="internal-link">about</a>
-            }
-          </Paragraph>
-        </li>
-      </ul>
-      {session ? (
-        <ul class="flex gap-6 text-sm">
+  <body>
+    <header class="fixed top-0 left-0 w-full h-[--header-size] pointer-events-none bg-gradient-to-b from-background to-transparent from-50%">
+      <nav class="flex gap-4 pointer-events-auto px-4 md:px-8 lg:px-12 pt-8">
+        <ul class="flex-1 flex gap-6 text-sm font-bold">
           <li>
-            <Paragraph class="font-bold">
-              {pathname === "/profile"
-                ? <span class="active-link">profile</span>
-                : <a href="/profile" class="internal-link">profile</a>
+            <Paragraph>
+              {pathname === "/"
+                ? <span class="active-link">directory</span>
+                : <a href="/" class="internal-link">directory</a>
               }
             </Paragraph>
           </li>
           <li>
-            <form method="POST" action="/auth/logout">
-              <button type="submit" class="internal-link text-sm leading-snug font-bold appearance-none">  
-                log out
-              </button>
-            </form>
+            <Paragraph>
+              {pathname === "/about"
+                ? <span class="active-link">about</span>
+                : <a href="/about" class="internal-link">about</a>
+              }
+            </Paragraph>
           </li>
-          {isAdmin && (
+        </ul>
+        {session ? (
+          <ul class="flex gap-6 text-sm">
             <li>
               <Paragraph class="font-bold">
-                {pathname === "/admin"
-                  ? <span class="active-link">admin</span>
-                  : <a href="/admin" class="internal-link">admin</a>
+                {pathname === "/profile"
+                  ? <span class="active-link">profile</span>
+                  : <a href="/profile" class="internal-link">profile</a>
                 }
               </Paragraph>
             </li>
-          )}
-        </ul>
-      ) : (
-        <ul class="flex gap-6 text-sm">
-          <li>
-            <Paragraph class="font-bold">
-              {pathname === "/auth/login"
-                ? <span class="active-link">log in</span>
-                : <a href="/auth/login" class="internal-link">log in</a>
-              }
-            </Paragraph>
-          </li>
-          <li>
-            <Paragraph class="font-bold">
-              {pathname === "/auth/signup"
-                ? <span class="active-link">sign up</span>
-                : <a href="/auth/signup" class="internal-link">sign up</a>
-              }
-            </Paragraph>
-          </li>
-        </ul>
-      )}
-    </nav>
+            <li>
+              <form method="POST" action="/auth/logout">
+                <button type="submit" class="internal-link text-sm leading-snug font-bold appearance-none">  
+                  log out
+                </button>
+              </form>
+            </li>
+            {isAdmin && (
+              <li>
+                <Paragraph class="font-bold">
+                  {pathname === "/admin"
+                    ? <span class="active-link">admin</span>
+                    : <a href="/admin" class="internal-link">admin</a>
+                  }
+                </Paragraph>
+              </li>
+            )}
+          </ul>
+        ) : (
+          <ul class="flex gap-6 text-sm">
+            <li>
+              <Paragraph class="font-bold">
+                {pathname === "/auth/login"
+                  ? <span class="active-link">log in</span>
+                  : <a href="/auth/login" class="internal-link">log in</a>
+                }
+              </Paragraph>
+            </li>
+            <li>
+              <Paragraph class="font-bold">
+                {pathname === "/auth/signup"
+                  ? <span class="active-link">sign up</span>
+                  : <a href="/auth/signup" class="internal-link">sign up</a>
+                }
+              </Paragraph>
+            </li>
+          </ul>
+        )}
+      </nav>
+    </header>
+    <div class="flex-1 pt-[--header-size] pb-[--footer-size] px-4 md:px-8 lg:px-12">
+      <slot />
+    </div>
+    <footer class="fixed bottom-0 left-0 w-full h-[--footer-size] pointer-events-none bg-gradient-to-b from-transparent to-background to-50% flex flex-col justify-end items-end">
+      <div class="flex gap-4 pointer-events-auto px-4 md:px-8 lg:px-12 pb-4">
+        <Paragraph class="text-sm" data-current-time>
+          00:00:00
+        </Paragraph>
+      </div>
+    </footer>
   </body>
 </html>
-<slot />
 
 <style is:global>
   @font-face {
@@ -133,8 +144,9 @@ if (session) {
   :root {
     --foreground: 240, 10%, 10%;
     --background: 40, 10%, 98%;
+    --header-size: 6em;
+    --footer-size: 8em;
   }
-  
   
   @media (prefers-color-scheme: dark) {
     :root {
@@ -147,12 +159,20 @@ if (session) {
     font-size: 14px;
   }
 
+  html, body {
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "ss01", "ss03", "ss04", "ss05";
     background: hsla(var(--background), 1);
     color: hsla(var(--foreground), 1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
   }
 
   .invert {
@@ -174,3 +194,24 @@ if (session) {
     @apply motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-out;
   }
 </style>
+
+<script is:inline>
+  function updateCurrentTime() {
+    const currentTime = document.querySelector('[data-current-time]');
+    if (currentTime) {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: 'America/Vancouver'
+      });
+      currentTime.textContent = formatter.format(now);
+
+      setTimeout(updateCurrentTime, 1000);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', updateCurrentTime);
+</script>

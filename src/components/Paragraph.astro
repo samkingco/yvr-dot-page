@@ -1,18 +1,18 @@
 ---
+import type { HTMLAttributes } from "astro/types"
 import { cn } from "../utils"
 
-type Props = {
-	class?: string
+type Props = HTMLAttributes<"p"> & {
 	asSpan?: boolean
 }
 
-const { class: _className, asSpan } = Astro.props
+const { class: _className, asSpan, ...props } = Astro.props
 
 const className = cn("leading-snug", _className)
 ---
 <>
   {asSpan 
-    ? <span class={className}><slot /></span>
-    : <p class={className}><slot /></p>
+    ? <span class={className} {...props}><slot /></span>
+    : <p class={className} {...props}><slot /></p>
   }
 </>
